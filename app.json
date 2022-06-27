@@ -24,7 +24,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "raadoinventory.raado"
     },
     "web": {
       "favicon": "./assets/favicon.png"
