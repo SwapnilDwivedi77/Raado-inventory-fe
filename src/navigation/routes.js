@@ -7,7 +7,8 @@ export default Object.freeze({
    OPEN_REQUEST : 'OPEN_REQUEST',
    PERMISSIONS : 'PERMISSIONS',
    HOME:'HOME',
-   PROFILE : 'PROFILE'
+   PROFILE : 'PROFILE',
+   NO_ACCESS : 'NO_ACCESS'
 
 
 });
