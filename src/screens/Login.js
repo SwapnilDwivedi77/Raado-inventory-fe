@@ -1,11 +1,11 @@
 import React from 'react'
 import {
     ToastAndroid,
-  } from 'react-native';
+} from 'react-native';
 
 import { StatusBar } from 'expo-status-bar';
 import { useDispatch, useSelector } from 'react-redux';
-import {navigateToTarget} from '../navigation/callNavigate'
+import { navigateToTarget } from '../navigation/callNavigate'
 
 import {
     StyledContainer,
@@ -21,7 +21,7 @@ import {
 } from '../components/style'
 
 import LoginForm from '../components/LoginForm'
-import {saveLoginDetails} from '../actions/users'
+import { saveLoginDetails } from '../actions/users'
 import routes from '../navigation/routes';
 import { userLoginCall } from '../actions/userLoginAction';
 
@@ -30,15 +30,8 @@ const Login = (props) => {
 
     const userData = useSelector(state => state.user);
     const loginState = useSelector(state => state.userLogin);
-    
-const dispatch = useDispatch();
 
-function notifyMessage(msg) {
-   
-      ToastAndroid.show(msg, ToastAndroid.SHORT)
-  }
-
-
+    const dispatch = useDispatch();
 
     const handleSubmitLogin = (values) => {
 
@@ -48,21 +41,21 @@ function notifyMessage(msg) {
         <StyledContainer>
             <StatusBar style='dark' />
             <InnerContainer>
-                <PageLogo  source={require('../../assets/img/logo.png')} style={{width : 360}}/>
+                <PageLogo source={require('../../assets/img/logo.png')} style={{ width: 360 }} />
                 {/* <PageTitle>Raado Inventory</PageTitle> */}
                 <SubTitle>Account Login</SubTitle>
                 <LoginForm
-                handleSubmitLogin={handleSubmitLogin}
-                loading={loginState.loading}
-                loginSuccess={loginState.success}
+                    handleSubmitLogin={handleSubmitLogin}
+                    loading={loginState.loading}
+                    loginSuccess={loginState.success}
                 />
                 <ExtraView>
                     <ExtraText>
                         Don't have an account already?  </ExtraText>
-                    <TextLink onPress={()=>navigateToTarget(routes.SIGNUP,props.navigation)}>
+                    <TextLink onPress={() => navigateToTarget(routes.SIGNUP, props.navigation)}>
                         <TextLinkContent >
                             Signup
-                            </TextLinkContent>
+                        </TextLinkContent>
                     </TextLink>
                 </ExtraView>
             </InnerContainer>
