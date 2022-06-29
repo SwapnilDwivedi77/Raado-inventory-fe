@@ -16,8 +16,8 @@ import {saveLoginDetails} from './users'
 
  export const userLoginCall = (userData,fn) => {
 
-
-    let URL = BASE_URL + USER_LOGIN + `?phoneNo=${userData.mobileNumber}&password=${userData.password}`
+console.log(userData)
+    let URL = BASE_URL + USER_LOGIN + `?phoneNo=${userData.mobileNumber ? userData.mobileNumber : userData.phoneNo}&password=${userData.password}`
 
     return dispatch => {
       dispatch(userLoginInit());
@@ -28,6 +28,7 @@ import {saveLoginDetails} from './users'
           dispatch(userLoginSucess());
           dispatch(saveLoginDetails(res.data.data))
           notifyMessage('Welcome Back!')
+          console.log(res.data.data)
         })
         .catch(err => {        
         notifyMessage('Invalid credentials')
