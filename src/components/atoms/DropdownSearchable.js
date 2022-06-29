@@ -1,19 +1,25 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { SafeAreaView, StyleSheet, FlatList, View,TouchableOpacity } from 'react-native';
+import {StyleSheet, FlatList, View,TouchableOpacity } from 'react-native';
 import { Colors, StyledText } from '../style';
 import TextInput from './TextInput';
 import debounce from 'lodash.debounce';
+import {isEmpty} from '../../utils/index'
 
 const DropdownSearchable = ({getItemSelection,usersList }) => {
   let timer;
   const [searchKey, setSearchKey] = useState('')
-  const [filteredUser, setFilteredUSer] = useState([])
+  const [filteredUser, setFilteredUSer] = useState(usersList)
+  const [showList,setShowList] = useState('false')
 
   const filterUser = (value) => {
+
+    if(value.length <3){
+       setFilteredUSer(usersList)
+      return}
     
     if (value.length >= 3) {
-      let list = usersList.filter(({ name, phoneNo }) => name.includes(value) || phoneNo.includes(value))
+      let list = usersList.filter(({ name, phoneNo }) => name.toLowerCase().includes(value.toLowerCase()) || phoneNo.includes(value))
       setFilteredUSer(list);
     }
     else {
@@ -29,7 +35,7 @@ const DropdownSearchable = ({getItemSelection,usersList }) => {
   const handleItemSelection = (item) => {
     getItemSelection(item)
     setSearchKey(item.name + ', ' + item.phoneNo)
-    setFilteredUSer([])
+    setShowList(!showList)
   }
 
   const handleChange = value => {
@@ -45,17 +51,19 @@ const DropdownSearchable = ({getItemSelection,usersList }) => {
         placeholderTextColor={Colors.darkLight}
         onChangeText={handleChange}
         value={searchKey}
+        onFocus={()=> setShowList(!showList)}
+        
       />
 
      
 
-      {filteredUser.length > 0 && <View style={styles.userList}>
-
+      {!showList && !isEmpty(filteredUser) && <View style={styles.userList}>
+   
         <FlatList
           data={filteredUser}
           renderItem={({ item }) => (
-            <View style={{ flex: 1, flexDirection: 'column', margin: 1, flexDirection: 'column' }} key={item.userId}>
-              <TouchableOpacity style={styles.user}  onPress={()=>handleItemSelection(item)} key={item.phoneNo}>
+            <View style={{ flex: 1, flexDirection: 'column', margin: 1, flexDirection: 'column',  }} key={item.userId}>
+              <TouchableOpacity style={styles.user} key={item.userId}  onPress={()=>handleItemSelection(item)}>
                 <StyledText>{item.name + ',' + item.phoneNo}</StyledText>
               </TouchableOpacity>
             </View>
@@ -64,8 +72,6 @@ const DropdownSearchable = ({getItemSelection,usersList }) => {
           numColumns={1}
           keyExtractor={(item, index) => item.key}
         />
-
-
       </View>
       }
 
@@ -92,20 +98,23 @@ const styles = StyleSheet.create({
 
   userList: {
     backgroundColor: Colors.primary,
-    height: "auto",
-    flex: 0,
-    width: 320,
-    // position: 'absolute',
+
+    flex: 1,
+    width: 285,
+    position: 'absolute',
+    zIndex:9999,
+    marginTop : '20%',
+   
   },
   user: {
     paddingTop: 10,
     paddingBottom: 10,
     paddingLeft: 10,
-    borderBottomColor: Colors.secondary,
+    borderBottomColor: Colors.light,
     borderBottomWidth: 2,
     width: "100%",
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: Colors.primary
+    backgroundColor : Colors.light
   }
 });
