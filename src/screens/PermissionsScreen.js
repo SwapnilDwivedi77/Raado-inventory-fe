@@ -2,11 +2,9 @@ import { View, FlatList, StyleSheet, ActivityIndicator, ScrollView } from 'react
 import React, { useEffect, useState } from 'react'
 import PremissionListItem from '../components/PremissionListItem'
 
-import { ScreenWrapper, StyledContainer } from '../components/style'
 import RoundButton from '../components/atoms/RoundButton'
 import { StyledHeadingText } from '../components/style'
 import { Colors } from '../Config/Colors'
-import { processDropdownList, processList } from '../constants/ProcessList'
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -14,8 +12,9 @@ import { Ionicons } from '@expo/vector-icons';
 import DropdownSearchable from '../components/atoms/DropdownSearchable'
 import { getAllUserCall } from '../actions/getAllUserAction'
 import { updateUserPermissionCall } from '../actions/updatePermissionAction'
-import routes from '../navigation/routes'
 import SafeAreaView from '../components/atoms/SafeAreaView'
+import { isEmpty } from '../utils'
+import PermissionList from '../components/PermissionList'
 
 
 
@@ -29,15 +28,36 @@ const PermissionsScreen = (props) => {
 
   const [selectedUser, setSelectedUser] = useState({})
   const [permissionList, setpermissionList] = useState()
+  const [userDropdownList, setUserDropdownList] = useState([])
+
+  const handleUserFetch = () => {
+    dispatch(getAllUserCall())
+  }
 
   useEffect(() => {
-    dispatch(getAllUserCall())
+    handleUserFetch();
   }, [])
+
+  useEffect(()=>{
+
+    let temp=[]
+
+    !isEmpty(usersList.list) && usersList.list.forEach((user) =>{
+      if(user.userId !== userData.userId) {
+        temp.push({id : user.userId,name : user.name + ',' + user.phoneNo})
+      }
+    })
+    setUserDropdownList(temp)
+
+
+  },[usersList])
 
   const handleItemSelection = (user) => {
 
     setSelectedUser(user)
-    setpermissionList(user.permissions)
+    let temp = usersList.list.filter(obj => obj.userId === user.id)
+    console.log("This is filltered user",temp[0].permissions)
+    setpermissionList(temp[0].permissions)
 
   }
 
@@ -83,16 +103,27 @@ const PermissionsScreen = (props) => {
   return (
 
     <SafeAreaView>
-      <ScrollView>
-        <View style={styles.container}>
+      <View style={{
+        position: 'absolute',
+        zIndex: 9999,
+        width: '100%'
 
-          <DropdownSearchable
-            style={{ backgroundColor: Colors.light }}
-            backgroundColor={Colors.light}
-            getItemSelection={(user) => handleItemSelection(user)}
-            usersList={usersList.list}
-          />
-          {usersList.loading && <ActivityIndicator size={'small'} />}
+      }}>
+        <DropdownSearchable
+
+          getItemSelection={(user) => handleItemSelection(user)}
+          items={userDropdownList}
+          selectedItem={selectedUser}
+          handleUserFetch={handleUserFetch}
+        />
+
+      </View>
+      <View style={styles.container}>
+
+
+
+
+        {usersList.loading && <ActivityIndicator size={'small'} />}
 
           <View style={styles.heading}>
             <View style={{ flex: .3 }}>
@@ -106,24 +137,10 @@ const PermissionsScreen = (props) => {
             </View>
           </View>
 
-
-
-          <FlatList
-            data={processDropdownList}
-            renderItem={({ item }) => (
-              <View style={{ flex: 1, flexDirection: 'column', margin: 1, flexDirection: 'column' }}>
-                <PremissionListItem
-                  permission={item}
-                  userPermissionData={permissionList}
-                  handlePermissionUpdate={handlePermissionUpdate}
-                  handleWritePermission={handleWritePermission}
-                  reset={updateState.success}
-                />
-              </View>
-            )}
-            //Setting the number of column
-            numColumns={1}
-            keyExtractor={(item, index) => index}
+          <PermissionList
+          permissionList ={permissionList}
+           handlePermissionUpdate={handlePermissionUpdate}
+           handleWritePermission={handleWritePermission}
           />
         </View>
 
@@ -137,7 +154,7 @@ const PermissionsScreen = (props) => {
             onPress={handleSubmit}
             icon={<Ionicons name="arrow-forward" size={34} color={Colors.primary} />}
           />}
-      </ScrollView>
+     
     </SafeAreaView>
   )
 }
@@ -147,7 +164,7 @@ export default PermissionsScreen
 const styles = StyleSheet.create({
   container: {
 
-
+marginTop : 40
 
   },
 

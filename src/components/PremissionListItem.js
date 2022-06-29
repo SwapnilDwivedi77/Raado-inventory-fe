@@ -23,13 +23,16 @@ const PremissionListItem = ({ permission, userPermissionData,handlePermissionUpd
                 }
             }
         })
-        // if(userPermissionData.length === 0) {
-        //     setIsEnabled(false)
-        //     setChecked(false)
-        // }
+
+        
+      return () => {
+        setIsEnabled(false)
+        setChecked(false)
+      }
 
     }, [userPermissionData])
     
+   
 
     const handleCheck = (permission) => {
         handlePermissionUpdate(permission,!isChecked)
