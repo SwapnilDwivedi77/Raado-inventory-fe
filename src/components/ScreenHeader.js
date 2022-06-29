@@ -15,6 +15,7 @@ import { HeaderWrapper, HeaderAction, DropdownWrapper } from './style'
 
 import { logoutUser } from '../actions/users';
 import { selectedProcessAction } from '../actions/selectedProcessAction'
+import {isEmpty} from '../utils/index'
 
 const ScreenHeader = (props) => {
 
@@ -30,11 +31,14 @@ const ScreenHeader = (props) => {
 
   useEffect(() => {
     let temp = []
-    userData?.permissions?.length > 0 && userData.permissions.forEach(({ processName }) => {
+
+    if(!isEmpty(userData) && !isEmpty(userData.permissions)){
+     userData.permissions.forEach(({ processName }) => {
       temp.push({ label: processLabels[processName], value: processName })
     });
     setpermissionDropdown(temp);
     dispatch(selectedProcessAction(temp[0].value))
+  }
 
   }, [])
 
