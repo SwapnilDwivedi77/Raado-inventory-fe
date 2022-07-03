@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "project_inventory",
-    "slug": "project_inventory",
-    "version": "1.0.0",
+    "name": "Raado",
+    "slug": "Raado",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
