@@ -11,13 +11,7 @@ import {notifyMessage} from '../utils/showToast'
 
 
  export const getActivityLogsCall = (selectedProcess,toUserId,fn) => {
-
-  console.log('logs call',selectedProcess)
-
     let URL = BASE_URL + GET_TRANSACTIONS_LIST + `?commonProcess=${selectedProcess}`
-
-    console.log(URL)
-
     return dispatch => {
       dispatch(fetchLogsInit());
   

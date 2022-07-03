@@ -24,7 +24,6 @@ import {notifyMessage} from '../utils/showToast'
         .then(res => {
           dispatch(fetchApprovalListSuccess(res.data.data));
           fn(false)
-          console.log('Approvaldata',res.data.data)
         })
         .catch(err => {
           dispatch(fetchApprovalListFailed());

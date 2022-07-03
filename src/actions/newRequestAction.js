@@ -20,7 +20,6 @@ import {getActivityLogsCall} from './fetchLogsAction'
 
     return dispatch => {
       dispatch(postNewREquestInit());
-      console.log({requestData})
       axios
       .post(URL, requestData)
       .then(res => {
