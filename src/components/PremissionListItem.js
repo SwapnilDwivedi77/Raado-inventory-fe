@@ -5,9 +5,10 @@ import { StyledText } from './style'
 
 import Checkbox from './atoms/Checkbox'
 import { useEffect } from 'react'
+import { isEmpty } from '../utils'
 
 
-const PremissionListItem = ({ permission, userPermissionData,handlePermissionUpdate,handleWritePermission,reset }) => {
+const PremissionListItem = ({ permission, userPermissionData,handlePermissionUpdate,handleWritePermission,reset,selectedUser }) => {
 
     const [isEnabled, setIsEnabled] = useState(false);
     const [isChecked, setChecked] = useState(false)
@@ -56,6 +57,7 @@ const PremissionListItem = ({ permission, userPermissionData,handlePermissionUpd
                     <Checkbox
                         isChecked={isChecked}
                        handleCheck ={()=>{handleCheck(permission)}}
+                       disabled ={isEmpty(selectedUser)}
                     />
                 </View>
 
@@ -91,8 +93,8 @@ export default PremissionListItem
 const styles = StyleSheet.create({
 
     container: {
-        paddingTop: 10,
-        paddingBottom: 10,
+        paddingTop: 5,
+        paddingBottom: 5,
         paddingLeft: 10,
         borderBottomColor: Colors.secondary,
         borderBottomWidth: 2,

@@ -1,6 +1,5 @@
-import { View, FlatList, StyleSheet, ActivityIndicator, ScrollView } from 'react-native'
+import { View, TouchableOpacity, StyleSheet, ActivityIndicator,ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import PremissionListItem from '../components/PremissionListItem'
 
 import RoundButton from '../components/atoms/RoundButton'
 import { StyledHeadingText } from '../components/style'
@@ -25,7 +24,6 @@ const PermissionsScreen = (props) => {
   const userData = useSelector(state => state.user).userData;
   const updateState = useSelector(state => state.updatePermission);
   const dispatch = useDispatch();
-
   const [selectedUser, setSelectedUser] = useState({})
   const [permissionList, setpermissionList] = useState()
   const [userDropdownList, setUserDropdownList] = useState([])
@@ -56,7 +54,7 @@ const PermissionsScreen = (props) => {
 
     setSelectedUser(user)
     let temp = usersList.list.filter(obj => obj.userId === user.id)
-    console.log("This is filltered user",temp[0].permissions)
+    console.log(temp[0].permissions)
     setpermissionList(temp[0].permissions)
 
   }
@@ -64,38 +62,36 @@ const PermissionsScreen = (props) => {
 
 
   const resetPage = () => {
-    console.log('resetCalled')
     setSelectedUser({})
     setpermissionList([])
     // props.navigation.navigate(routes.LISTINGS)
   }
 
-
+let updatedPermission = permissionList
 
   const handleSubmit = () => {
-
-    dispatch(updateUserPermissionCall(selectedUser.userId, permissionList, resetPage))
+    dispatch(updateUserPermissionCall(selectedUser.id, updatedPermission, resetPage))
   }
 
   const handlePermissionUpdate = (permission, isChecked) => {
 
-    if (selectedUser && selectedUser.userId) {
+    if (selectedUser && selectedUser.id) {
       if (!isChecked) {
-        let idx = permissionList.findIndex(({ processName }) => processName === permission.value)
+        let idx = updatedPermission.findIndex(({ processName }) => processName === permission.value)
         if (idx > -1)
-          permissionList.splice(idx, 1)
+        updatedPermission.splice(idx, 1)
       }
       else {
-        permissionList.push({ processName: permission.value, write: false })
+        updatedPermission.push({ processName: permission.value, write: false })
       }
     }
   }
 
   const handleWritePermission = (permission, isEnabled) => {
-    if (selectedUser && selectedUser.userId)
-    {let idx = permissionList.findIndex(({ processName }) => processName === permission.value)
+    if (selectedUser && selectedUser.id)
+    {let idx = updatedPermission.findIndex(({ processName }) => processName === permission.value)
     if (idx > -1)
-      permissionList[idx].write = !permissionList[idx].write}
+    updatedPermission[idx].write = !updatedPermission[idx].write}
   }
 
 
@@ -103,25 +99,24 @@ const PermissionsScreen = (props) => {
   return (
 
     <SafeAreaView>
-      <View style={{
-        position: 'absolute',
-        zIndex: 9999,
-        width: '100%'
+      
+      <View style={{width: '80%', position: 'absolute',
+          zIndex: 9999,marginLeft : 30,}}>
+          <DropdownSearchable
+            getItemSelection={(user) => handleItemSelection(user)}
+            items={userDropdownList}
+            selectedItem={selectedUser}
+            handleUserFetch={handleUserFetch}
+          />
+        </View>
+        <View>
+          <TouchableOpacity onPress={() => {handleUserFetch();resetPage();}} style={{ marginLeft: 'auto',marginTop:20 }}>
+            <Ionicons name="reload-circle" size={34} color={Colors.brand} />
+          </TouchableOpacity>
+        </View>
 
-      }}>
-        <DropdownSearchable
 
-          getItemSelection={(user) => handleItemSelection(user)}
-          items={userDropdownList}
-          selectedItem={selectedUser}
-          handleUserFetch={handleUserFetch}
-        />
-
-      </View>
       <View style={styles.container}>
-
-
-
 
         {usersList.loading && <ActivityIndicator size={'small'} />}
 
@@ -141,6 +136,7 @@ const PermissionsScreen = (props) => {
           permissionList ={permissionList}
            handlePermissionUpdate={handlePermissionUpdate}
            handleWritePermission={handleWritePermission}
+           selectedUser={selectedUser}
           />
         </View>
 
@@ -164,7 +160,7 @@ export default PermissionsScreen
 const styles = StyleSheet.create({
   container: {
 
-marginTop : 40
+marginTop : 25
 
   },
 

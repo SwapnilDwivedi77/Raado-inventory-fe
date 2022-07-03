@@ -3,7 +3,7 @@ import React from 'react'
 import { processDropdownList} from '../constants/ProcessList'
 import PremissionListItem from './PremissionListItem'
 
-const PermissionList = ({permissionList, handlePermissionUpdate,handleWritePermission}) => {
+const PermissionList = ({permissionList, handlePermissionUpdate,handleWritePermission,selectedUser}) => {
   return (
     <FlatList
             data={processDropdownList}
@@ -14,6 +14,7 @@ const PermissionList = ({permissionList, handlePermissionUpdate,handleWritePermi
                   userPermissionData={permissionList}
                   handlePermissionUpdate={handlePermissionUpdate}
                   handleWritePermission={handleWritePermission}
+                  selectedUser={selectedUser}
                 />
               </View>
             )}
