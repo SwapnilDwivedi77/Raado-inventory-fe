@@ -4,13 +4,14 @@ import React from 'react'
 import { Picker } from "@react-native-picker/picker";
 import Colors from '../../Config/Colors'
 
-const Dropdown = ({handlePickerChange , styles,selectedValue , itemList,itemStyles}) => {
+const Dropdown = ({handlePickerChange , styles,selectedValue , itemList,enabled}) => {
   return (
    <Picker
         selectedValue={selectedValue}
         onValueChange={(value, index) =>handlePickerChange(value,index)}
         mode="dropdown" // Android only
         style={styles}
+        enabled={enabled}
        >
 
 {itemList.map((item,index) => {

@@ -4,10 +4,11 @@ import React from 'react'
 import { Ionicons } from '@expo/vector-icons';
 
 
-const RoundButton = ({styles,onPress,width,height,icon}) => {
+const RoundButton = ({styles,onPress,width,height,icon,disabled}) => {
   return (
     <TouchableOpacity
         onPress={onPress}
+        disabled={disabled}
         style={{...style.roundButton1,...styles,width,height}}>
       {icon}
       </TouchableOpacity>
