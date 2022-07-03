@@ -1,109 +1,105 @@
 import { StyleSheet, View, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Formik } from 'formik'
-
-import DropdownSearchable from './atoms//DropdownSearchable'
 import RoundButton from './atoms/RoundButton'
-
 import { Ionicons } from '@expo/vector-icons';
 import {
   Colors,
   RequestFormWrapper,
-  StyledInputLabel, StyledHeadingText,
+  StyledInputLabel, StyledHeadingText, TextLinkContent,
 } from './style'
 
 
 import NumericInput from './atoms/NumericInput'
-import { processStepsMap, processLabels, processList, processDropdownList, processFlow } from '../constants/ProcessList'
+import { processStepsMap, processLabels, processList, processFlow } from '../constants/ProcessList'
 import Card from './atoms/Card'
-import { users } from '../mockData'
-import TextInput from './atoms/TextInput'
 import Dropdown from './atoms/Dropdown'
 import { useSelector } from 'react-redux'
-import { getNewRequestEntries } from '../utils'
+import { getNewRequestEntries, isEmpty } from '../utils'
 
 
 
 const NewRequestForm = ({ handleNewRequestSubmit, loading, handleDropdownChange, selectedProcess }) => {
 
-  const fromUserId = useSelector(state => state.user).userData.userId
+  const { userData } = useSelector(state => state.user)
+  let fromUserId = userData.userId
   const usersList = useSelector(state => state.allUsers).list;
   const [selectedNextProcess, setselectedNextProcess] = useState(processList.WAREHOUSE)
   const [nextProcessOptions, setNextProcessOptions] = useState([])
   const [filteredUsers, setFilteredUser] = useState([])
-  const [selectedNextUser,setNextUser] = useState('')
-  const [formRender , setFormRender] = useState([])
+  const [selectedNextUser, setNextUser] = useState('')
+  const [isWrite, setIsWrite] = useState(false)
 
   const findUserdWithNextPermissions = (nextProcess) => {
     let nextUsers = []
-    if(usersList.length > 0)
-    {usersList.forEach((user) => {
-      if (user && user.permissions?.some((per) => per.processName === nextProcess) && user.userId !== fromUserId) {
-        let idx = processFlow.indexOf(idx + 1)
-        nextUsers.push({ label: user.name, value: user.userId })
-      }
-    })
-    setFilteredUser(nextUsers)
-    if(nextUsers.length > 0)
-    setNextUser(nextUsers[0].value)}
+    if (usersList.length > 0) {
+      usersList.forEach((user) => {
+        if (user && user.permissions?.some((per) => per.processName === nextProcess) && user.userId !== fromUserId) {
+          let idx = processFlow.indexOf(idx + 1)
+          nextUsers.push({ label: user.name, value: user.userId })
+        }
+      })
+      setFilteredUser(nextUsers)
+      if (nextUsers.length > 0)
+        setNextUser(nextUsers[0].value)
+    }
   }
   const findNextProcessForUser = () => {
 
     let nextProcess = []
-    if(selectedProcess==processList.WAREHOUSE) {
+    if (selectedProcess == processList.WAREHOUSE) {
       processFlow.forEach((pre) => {
-        nextProcess.push({label : processLabels[pre],value:pre})
+        nextProcess.push({ label: processLabels[pre], value: pre })
 
-      }) 
-      
+      })
+
       setNextProcessOptions(nextProcess)
       setselectedNextProcess(nextProcess[0].value)
       findUserdWithNextPermissions(nextProcess[0].value)
     }
-    else
-    {
+    else {
       let idx = processFlow.indexOf(selectedProcess)
-    nextProcess = processFlow[idx + 1]
-    setNextProcessOptions([{ label: processLabels[nextProcess], value: nextProcess },{ label: processLabels.WAREHOUSE, value: processList.WAREHOUSE }])
-    findUserdWithNextPermissions(nextProcess)
+      nextProcess = processFlow[idx + 1]
+      setNextProcessOptions([{ label: processLabels[nextProcess], value: nextProcess }, { label: processLabels.WAREHOUSE, value: processList.WAREHOUSE }])
+      findUserdWithNextPermissions(nextProcess)
+    }
+
   }
- 
-}
 
   useEffect(() => {
 
     findNextProcessForUser()
-    
-    let renderProcess = selectedNextProcess === processList.WAREHOUSE ? selectedProcess : selectedNextProcess
-    setFormRender(renderProcess)
-  
+
+    let write = true;
+    if (!isEmpty(userData) && !isEmpty(userData.permissions))
+      write = userData.permissions.filter((per) => per.processName === selectedProcess)[0].write
+    console.log('This is write', write)
+    setIsWrite(write)
 
   }, [selectedProcess])
 
-  
+
   const handleNextProcessSelection = (sel) => {
-    console.log(sel)
     setselectedNextProcess(sel)
     findUserdWithNextPermissions(sel)
     let renderProcess = sel === processList.WAREHOUSE ? sel : sel
     setFormRender(renderProcess)
-  
+
   }
 
-  const handleUserSelection = (value,index) => {
-    console.log(value)
+  const handleUserSelection = (value, index) => {
     setNextUser(value)
   }
 
-  const handleFormSubmission =(values) => {
+  const handleFormSubmission = (values) => {
 
     let formData = {
-      fromProcess : selectedProcess ,
-      toProcess : selectedNextProcess,
-      status : 'CREATED',
-      entries :  getNewRequestEntries(values,selectedProcess === processList.WAREHOUSE ? selectedNextProcess : selectedProcess),
-      fromUserId : fromUserId,
-      toUserId : selectedNextUser
+      fromProcess: selectedProcess,
+      toProcess: selectedNextProcess,
+      status: 'CREATED',
+      entries: getNewRequestEntries(values, selectedProcess === processList.WAREHOUSE ? selectedNextProcess : selectedProcess),
+      fromUserId: fromUserId,
+      toUserId: selectedNextUser
     }
     handleNewRequestSubmit(formData)
   }
@@ -134,27 +130,29 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, handleDropdownChange,
           itemList={nextProcessOptions}
           styles={styles.picker}
           itemStyles={styles.pickerItem}
+          enabled={isWrite}
         />
       </View>
       <View style={styles.pickerContainer}>
         <StyledInputLabel style={{ color: Colors.brand }}>Select receiving user</StyledInputLabel>
         <Dropdown
           selectedValue={selectedNextUser}
-          handlePickerChange={(value,index) =>handleUserSelection(value,index)}
+          handlePickerChange={(value, index) => handleUserSelection(value, index)}
           itemList={filteredUsers}
           styles={styles.picker}
           itemStyles={styles.pickerItem}
+          enabled={isWrite}
         />
       </View>
 
       <Formik
         initialValues={initialValues}
-        onSubmit={(values,{resetForm}) => {
+        onSubmit={(values, { resetForm }) => {
 
           handleFormSubmission(values)
-          setTimeout(()=>{ resetForm(initialValues)},500)
-         
-         
+          setTimeout(() => { resetForm(initialValues) }, 500)
+
+
         }}>
 
         {({ handleChange, handleBlur, handleSubmit, resetForm, values, }) => (
@@ -163,12 +161,13 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, handleDropdownChange,
             <View >
               <View style={styles.labelContainer}>
                 <StyledHeadingText>Product details for this step.</StyledHeadingText>
+
               </View>
               <RequestFormWrapper>
 
                 <Card>
 
-                  {processStepsMap[selectedProcess!== processList.WAREHOUSE ? selectedProcess : selectedNextProcess]?.map(({ value, label }, index) => {
+                  {processStepsMap[selectedProcess !== processList.WAREHOUSE ? selectedProcess : selectedNextProcess]?.map(({ value, label }, index) => {
                     return (
                       <View style={styles.inputContainer}>
                         <NumericInput
@@ -182,6 +181,7 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, handleDropdownChange,
                           placeholder={'kgs'}
                           placeholderTextColor={Colors.secondary}
                           placeholderFontSize={18}
+                          editable={isWrite}
                         />
                       </View>
                     )
@@ -203,8 +203,10 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, handleDropdownChange,
                   buttonClickedHandler={handleSubmit}
                   iconSize={40}
                   onPress={handleSubmit}
+                  disabled={!isWrite}
                   icon={<Ionicons name="arrow-forward" size={24} color={Colors.primary} />}
                 />}
+              {!isWrite && <View style={{ marginLeft: 'auto', marginRight: 'auto' }}><TextLinkContent>Dont have write access for this process.</TextLinkContent></View>}
             </View>
 
 
