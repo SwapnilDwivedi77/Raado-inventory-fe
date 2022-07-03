@@ -191,6 +191,8 @@ export const DropdownWrapper = styled.View`
     height: 45px ;
     display: flex ;
     justify-content: center ;
+    flex-direction : row;
+    align-items : center;
 `
 
 export const ScreenWrapper = styled.View`

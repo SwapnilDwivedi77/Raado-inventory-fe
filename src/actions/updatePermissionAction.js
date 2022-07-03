@@ -6,7 +6,7 @@ import {UPDATE_USER_PERMISSION_INIT,
 
 import {BASE_URL,UPDATE_USER_PERMISSION} from '../constants/urls'
 import { notifyMessage } from '../utils/showToast'
-import {saveLoginDetails} from './users'
+import {getAllUserCall} from './getAllUserAction'
 
 
  const updateUserPermissionInit = () =>( {type:UPDATE_USER_PERMISSION_INIT})
@@ -28,7 +28,8 @@ import {saveLoginDetails} from './users'
       axios
         .patch(URL, payload)
         .then(res => {
-          dispatch(updateUserPermissionSucess());      
+          dispatch(updateUserPermissionSucess()); 
+          dispatch(getAllUserCall())     
           notifyMessage('Permissions Updated!')
           fn()
         })

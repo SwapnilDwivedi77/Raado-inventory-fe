@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavigationContainer } from '@react-navigation/native';
-import { useSelector } from 'react-redux'
+import {useSelector } from 'react-redux'
 import AuthNavigator from './AuthNavigator';
 import navigationTheme from './navigationTheme';
 import PostLoginNavigator from './PostLoginNavigator';
@@ -12,6 +12,8 @@ import NoAccessNavigator from './NoAccessNavigator';
 const AppNavigator = ({ }) => {
 
     const { isLoggedin, userData } = useSelector(state => state.user);
+   
+    
     return (
 
         <NavigationContainer theme={navigationTheme}>

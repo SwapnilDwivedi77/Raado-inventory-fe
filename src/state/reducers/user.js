@@ -3,6 +3,7 @@ import { SAVE_LOGIN_INFO,USER_LOGOUT } from "../../constants/action";
 const INITIAL_STATE = {
     userData : {},
     isLoggedin : false,
+    refresh : false,
 }
 
 export const userLogin  = (user =INITIAL_STATE , action) => {
