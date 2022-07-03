@@ -3,11 +3,17 @@ import React from 'react'
 
 
 import SafeAreaView from '../components/atoms/SafeAreaView'
+import NewRequestForm from '../components/NewRequestForm'
 
 const ProductRatesScreen = () => {
   return (
     <SafeAreaView>
-      <Text>Rates screen</Text>
+      <NewRequestForm
+         handleNewRequestSubmit={console.log()}
+         handleDropdownChange={console.log()}
+         selectedProcess={'WAREHOUSE'}
+         loading = {false}
+         />
     </SafeAreaView>
   )
 }
