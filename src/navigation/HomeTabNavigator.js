@@ -10,22 +10,7 @@ import NewListingButton from '../components/NewListingButton'
 
 import routes from './routes'
 import 'react-native-gesture-handler';
-import {Colors} from '../Config/Colors'
 const Tab = createBottomTabNavigator()
-
-
-const headerStyles = {
-    headerTintColor: Colors.brand,
-    headerStyle: {
-      borderBottomWidth: 0,
-      backgroundColor: Colors.brand,
-      shadowColor: '#000',
-      shadowOpacity: 0.25,
-      shadowRadius: 20,
-      shadowOffset: { width: 0, height: 0 },
-      height: 110
-    }
-  }
 
 
 const HomeTabNavigator = () => (
