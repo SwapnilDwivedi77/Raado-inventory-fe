@@ -1,13 +1,11 @@
 import React, { useEffect, useState, } from 'react'
 import { View, ActivityIndicator, FlatList,RefreshControl } from 'react-native'
 import ListingItem from '../components/ListingItem'
-import { ScreenWrapper, StyledContainer } from '../components/style'
-
-
 import { getActivityLogsCall } from '../actions/fetchLogsAction'
 import SafeAreaView from '../components/atoms/SafeAreaView'
 import { useDispatch, useSelector } from 'react-redux';
 import Empty from '../components/atoms/Empty'
+import PullToRefresh from '../components/atoms/PullToRefresh';
 
 const ListingsScreen = (props) => {
 
@@ -27,8 +25,11 @@ const ListingsScreen = (props) => {
     }, [selectedProcess])
 
     if(activityLogs.list.length === 0 ) 
-    return <Empty/>
-
+    return (
+        <PullToRefresh refreshing={refreshing} onRefresh={fetchTransactionLogs} style={{paddingTop : '50%'}}>
+            <Empty />
+        </PullToRefresh>
+    )
 
     return (
     
