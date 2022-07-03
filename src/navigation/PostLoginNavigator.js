@@ -1,9 +1,9 @@
-import { Button, Text } from 'react-native'
 import React from 'react'
-
+import {Text} from 'react-native'
 import { createStackNavigator } from '@react-navigation/stack'
 
 import PermissionsScreen from '../screens/PermissionsScreen'
+import ProductRatesScreen from '../screens/ProductRatesScreen'
 import { Ionicons } from '@expo/vector-icons';
 import routes from './routes'
 import HomeTabNavigator from './HomeTabNavigator'
@@ -67,6 +67,15 @@ const PostLoginNavigator = () => {
     <Stack.Screen name={routes.PROFILE} component={ProfileScreen}
     options={({ navigation }) => ({
       headerTitle: (props) => <Text>Profile</Text>,
+      headerLeft: (props) => (
+        <BackButton navigation={navigation}/>
+      ),
+      ...stackHeader
+  })}
+    />
+     <Stack.Screen name={routes.RATES} component={ProductRatesScreen}
+    options={({ navigation }) => ({
+      headerTitle: (props) => <Text>Product rates</Text>,
       headerLeft: (props) => (
         <BackButton navigation={navigation}/>
       ),

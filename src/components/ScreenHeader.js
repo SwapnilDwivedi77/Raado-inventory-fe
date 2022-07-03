@@ -1,7 +1,7 @@
 import { TouchableOpacity, StyleSheet } from 'react-native'
 import React, { useState, useEffect } from 'react'
 
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons,Ionicons,FontAwesome } from '@expo/vector-icons';
 import { Menu, MenuItem, MenuDivider } from 'react-native-material-menu';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -40,7 +40,7 @@ const ScreenHeader = (props) => {
     dispatch(selectedProcessAction(temp[0].value))
   }
 
-  }, [])
+  }, [userData])
 
   const [selectedValue, setSelectedValue] = useState(processDropdownList[0].value)
   const [menuVisible, setMenuVisible] = useState(false);
@@ -59,6 +59,10 @@ const ScreenHeader = (props) => {
     props.navigate(route)
     hideMenu()
   }
+
+  const handlePermissionRefresh = () => {
+    dispatch(userLoginCall(userData))
+  }
   return (
     <>
       <HeaderWrapper style={styles.header}>
@@ -68,6 +72,9 @@ const ScreenHeader = (props) => {
             itemList={permissionDropdown}
             styles={styles.picker}
             itemStyles={styles.pickerItem} />
+             <TouchableOpacity onPress={() => {handlePermissionRefresh}} style={{marginRight:4}}>
+            <Ionicons name="reload-circle" size={24} color={Colors.primary} />
+          </TouchableOpacity>
         </DropdownWrapper>
         <HeaderAction>
           <Menu
@@ -82,7 +89,14 @@ const ScreenHeader = (props) => {
               <>
                 <MenuItem onPress={() => handleMenuNavigation(routes.PERMISSIONS)}>
                   <MaterialIcons name="admin-panel-settings" size={24} color={Colors.brand} />
-                  Permissions</MenuItem>
+                  Permissions
+                  </MenuItem>
+                <MenuDivider color={Colors.brand} />
+
+                <MenuItem onPress={() => handleMenuNavigation(routes.RATES)}>
+                <FontAwesome name="rupee" size={24} color={Colors.brand} />
+                  Rates
+                </MenuItem>
                 <MenuDivider color={Colors.brand} />
               </>
             }
