@@ -19,7 +19,7 @@ const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2
 
 const validationSchema = Yup.object().shape({
     fullName: Yup.string().required('Name cannot be empty').min(1).max(15).label("Name"),
-    mobileNumber: Yup.string().required('Mobile number cannot be empty').matches(phoneRegExp, 'Phone number is not valid').label('Mobile Number'),
+    mobileNumber: Yup.string().required('Mobile number cannot be empty').length(10,'Enter 10 digits').matches(phoneRegExp, 'Phone number is not valid').label('Mobile Number'),
     password: Yup.string().required('Password cannot be empty'),
     confirmPassword: Yup.string().required('Passwords cannot be empty')
      .oneOf([Yup.ref('password'), null], 'Passwords must match').label('Password')
