@@ -8,7 +8,8 @@ export default Object.freeze({
    PERMISSIONS : 'PERMISSIONS',
    HOME:'HOME',
    PROFILE : 'PROFILE',
-   NO_ACCESS : 'NO_ACCESS'
+   NO_ACCESS : 'NO_ACCESS',
+   RATES:'RATES'
 
 
 });
