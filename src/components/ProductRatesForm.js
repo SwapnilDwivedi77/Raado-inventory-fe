@@ -1,4 +1,4 @@
-import { StyleSheet, View, ActivityIndicator } from 'react-native'
+import { StyleSheet, View, ActivityIndicator , Switch} from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Formik } from 'formik'
 import RoundButton from './atoms/RoundButton'
@@ -11,7 +11,7 @@ import {
 
 
 import NumericInput from './atoms/NumericInput'
-import { processStepsMap, processLabels, processList, processFlow } from '../constants/ProcessList'
+import { processStepsMap, processLabels, processList, processFlow, processDropdownList } from '../constants/ProcessList'
 import Card from './atoms/Card'
 import Dropdown from './atoms/Dropdown'
 import { useSelector } from 'react-redux'
@@ -19,22 +19,24 @@ import { getNewRequestEntries,} from '../utils'
 
 
 
-const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) => {
+const ProductRatesForm = ({ handleNewRequestSubmit, loading, handleDropdownChange }) => {
 
   const { userData,userPermissions } = useSelector(state => state.user)
   let fromUserId = userData.userId
   const usersList = useSelector(state => state.allUsers).list;
-  const [selectedNextProcess, setselectedNextProcess] = useState(processList.WAREHOUSE)
-  const [nextProcessOptions, setNextProcessOptions] = useState([])
+  const [selectedProcess, setselectedNextProcess] = useState(processDropdownList[0].value)
   const [filteredUsers, setFilteredUser] = useState([])
   const [selectedNextUser, setNextUser] = useState('')
-  const [isWrite, setIsWrite] = useState(false)
 
-  const findUserdWithNextPermissions = (nextProcess) => {
+
+  const [userToggle , setUserToggle] = useState(false)
+
+ 
+  const userWithProcessPermissions = (nextProcess) => {
     let nextUsers = []
     if (usersList.length > 0) {
       usersList.forEach((user) => {
-        if (user && user.permissions?.some((per) => per.processName === nextProcess) && user.userId !== fromUserId) {
+        if (user && user.permissions?.some((per) => per.processName === selectedProcess) && user.userId !== fromUserId) {
           let idx = processFlow.indexOf(idx + 1)
           nextUsers.push({ label: user.name, value: user.userId })
         }
@@ -44,58 +46,30 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) =>
         setNextUser(nextUsers[0].value)
     }
   }
-  const findNextProcessForUser = () => {
-
-    let nextProcess = []
-    if (selectedProcess == processList.WAREHOUSE) {
-      processFlow.forEach((pre) => {
-        nextProcess.push({ label: processLabels[pre], value: pre })
-
-      })
-
-      setNextProcessOptions(nextProcess)
-      setselectedNextProcess(nextProcess[0].value)
-      findUserdWithNextPermissions(nextProcess[0].value)
-    }
-    else {
-      let idx = processFlow.indexOf(selectedProcess)
-      nextProcess = processFlow[idx + 1]
-      setNextProcessOptions([{ label: processLabels[nextProcess], value: nextProcess }, { label: processLabels.WAREHOUSE, value: processList.WAREHOUSE }])
-      findUserdWithNextPermissions(nextProcess)
-    }
-
-  }
-
-  useEffect(() => {
-
-    findNextProcessForUser()
-
-    let write = true;
-    write = userPermissions.filter((per) => per.processName === selectedProcess)[0].write
-    setIsWrite(write)
-
-  }, [selectedProcess])
 
 
-  const handleNextProcessSelection = (sel) => {
+  const handleProcessSelection = (sel) => {
     setselectedNextProcess(sel)
-    findUserdWithNextPermissions(sel)
-    let renderProcess = sel === processList.WAREHOUSE ? sel : sel
-    setFormRender(renderProcess)
-
+    userWithProcessPermissions()
   }
 
   const handleUserSelection = (value, index) => {
     setNextUser(value)
   }
 
+  const handleUserToggle = (value) => {
+        console.log(value)
+        setUserToggle(value)
+       value && userWithProcessPermissions()
+  }
+
   const handleFormSubmission = (values) => {
 
     let formData = {
       fromProcess: selectedProcess,
-      toProcess: selectedNextProcess,
+      toProcess: selectedProcess,
       status: 'CREATED',
-      entries: getNewRequestEntries(values, selectedProcess === processList.WAREHOUSE ? selectedNextProcess : selectedProcess),
+      entries: getNewRequestEntries(values, selectedProcess === processList.WAREHOUSE ? selectedProcess : selectedProcess),
       fromUserId: fromUserId,
       toUserId: selectedNextUser
     }
@@ -121,27 +95,51 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) =>
     <>
 
       <View style={styles.pickerContainer}>
-        <StyledInputLabel style={{ color: Colors.brand }}>Select next Process</StyledInputLabel>
+
+            <View style={styles.rateContainer}>
+                <View style={{flex:.4,justifyContent:'center',alignItems : 'flex-end',}}>
+                <StyledHeadingText style={styles.toggleLabel}>Global Rates</StyledHeadingText>
+                </View>
+
+                <View style={{flex:.2,justifyContent:'center',alignItems : 'center'}}>
+                <Switch
+                        trackColor={{ false: "#767577", true: Colors.red }}
+                        thumbColor={userToggle ? Colors.brand : "#f4f3f4"}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={handleUserToggle}
+                        value={userToggle}
+                    />
+                </View>
+
+                <View style={{flex:.4,justifyContent:'center',alignItems:'flex-start'}}>
+                <StyledHeadingText style={styles.toggleLabel}>User Rates</StyledHeadingText>
+                </View>
+            </View>
+
+
+
+
+        <StyledInputLabel style={{ color: Colors.brand,marginBottom : 5 }}>Select Process</StyledInputLabel>
         <Dropdown
-          selectedValue={selectedNextProcess}
-          handlePickerChange={handleNextProcessSelection}
-          itemList={nextProcessOptions}
+          selectedValue={selectedProcess}
+          handlePickerChange={handleProcessSelection}
+          itemList={processDropdownList}
           styles={styles.picker}
           itemStyles={styles.pickerItem}
-          enabled={isWrite}
+    
         />
       </View>
-      <View style={styles.pickerContainer}>
-        <StyledInputLabel style={{ color: Colors.brand }}>Select receiving user</StyledInputLabel>
+     {userToggle && <View style={styles.pickerContainer}>
+        <StyledInputLabel style={{ color: Colors.brand }}>Select user</StyledInputLabel>
         <Dropdown
           selectedValue={selectedNextUser}
           handlePickerChange={(value, index) => handleUserSelection(value, index)}
           itemList={filteredUsers}
           styles={styles.picker}
           itemStyles={styles.pickerItem}
-          enabled={isWrite}
+       
         />
-      </View>
+      </View>}
 
       <Formik
         initialValues={initialValues}
@@ -158,14 +156,14 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) =>
 
             <View >
               <View style={styles.labelContainer}>
-                <StyledHeadingText>Product details for this step.</StyledHeadingText>
+                <StyledHeadingText>Enter rates (in /kgs)</StyledHeadingText>
 
               </View>
               <RequestFormWrapper>
 
                 <Card>
 
-                  {processStepsMap[selectedProcess !== processList.WAREHOUSE ? selectedProcess : selectedNextProcess]?.map(({ value, label }, index) => {
+                  {processStepsMap[selectedProcess !== processList.WAREHOUSE ? selectedProcess : selectedProcess]?.map(({ value, label }, index) => {
                     return (
                       <View style={styles.inputContainer}>
                         <NumericInput
@@ -176,10 +174,9 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) =>
                           value={values[value]}
                           keyboardType="number-pad"
                           width={70}
-                          placeholder={'kgs'}
+                          placeholder={'₹'}
                           placeholderTextColor={Colors.secondary}
                           placeholderFontSize={18}
-                          editable={isWrite}
                         />
                       </View>
                     )
@@ -201,11 +198,10 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) =>
                   buttonClickedHandler={handleSubmit}
                   iconSize={40}
                   onPress={handleSubmit}
-                  disabled={!isWrite}
+                 
                   icon={<Ionicons name="arrow-forward" size={24} color={Colors.primary} />}
                 />}
-              {!isWrite && <View style={{ marginLeft: 'auto', marginRight: 'auto' }}><TextLinkContent>Dont have write access for this process.</TextLinkContent></View>}
-            </View>
+             </View>
 
 
           </>
@@ -218,7 +214,7 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) =>
   )
 }
 
-export default NewRequestForm
+export default ProductRatesForm
 
 
 const styles = StyleSheet.create({
@@ -261,6 +257,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20
+  },
+  rateContainer : {
+    flexDirection : 'row',
+    justifyContent : 'center',
+    width : '100%',
+    paddingRight : 5,
+    paddingLeft : 5,
+    paddingBottom : 5,
+    paddingTop : 5,
+    marginTop : 15,
+    marginBottom : 25
+  },
+
+  toggleLabel : {
+    textTransform : 'capitalize',
+    fontSize: 16,
+    fontWeight : 'bold',
   }
 
 })

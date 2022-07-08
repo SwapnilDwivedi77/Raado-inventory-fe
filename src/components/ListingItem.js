@@ -2,13 +2,13 @@ import { View, StyleSheet, FlatList, Text } from 'react-native'
 import React, { useEffect, useState } from 'react'
 
 import Card from './atoms/Card'
-import { CardHeadingLabel, CardContentLabel } from './atoms/CradLabel'
+import { CardContentLabel } from './atoms/CradLabel'
 import { Entypo } from '@expo/vector-icons';
-import { processColor, statusColor, cardColor } from '../Config/Colors'
+import { statusColor, cardColor } from '../Config/Colors'
 import { FontAwesome } from '@expo/vector-icons';
 import { Colors, Line, StyledHeadingText, StyledText } from './style'
 import moment from "moment";
-
+import { MaterialIcons } from '@expo/vector-icons';
 import RoundButton from './atoms/RoundButton'
 import { ActivityIndicator } from 'react-native';
 
@@ -19,39 +19,48 @@ const ListingItem = ({ listings,loading, isApprovalTab = false, handleApproval,.
 
   return (
     <View>
-      <Card height={isApprovalTab ? 300  : 270} style={ !isApprovalTab ? {  borderLeftWidth: 3, borderLeftColor: statusColor[listings.status], borderLeftRadius: 20 } :''}>
+      <Card height={isApprovalTab ? 300  : 240}>
 
         <View style={styles.process}>
-          <CardContentLabel style={{ color: '#6A0D01', backgroundColor: cardColor.SENDER.backgroundColor, marginRight: 12 }}>{listings.fromProcess.split('_').join(' ')}</CardContentLabel>
-          <FontAwesome name="arrow-circle-right" size={24} color={Colors.textBlue} />
-          <CardContentLabel style={{ color: '#6A0D01', backgroundColor: cardColor.RECEIVER.backgroundColor, marginLeft: 12 }}>{listings.toProcess.split('_').join(' ')}</CardContentLabel>
+          <CardContentLabel style={{ color: '#6A0D01', backgroundColor: cardColor.SENDER.backgroundColor, marginRight: 12, flex : .4 }}>{listings.fromProcess.split('_').join(' ')}</CardContentLabel>
+          <FontAwesome name="arrow-circle-right" size={24} color={!isApprovalTab ? statusColor[listings.status]: Colors.textBlue} style={{flex:.2}} />
+          <CardContentLabel style={{ color: '#6A0D01', backgroundColor: cardColor.RECEIVER.backgroundColor, flex:.4, marginLeft: 12 }}>{listings.toProcess.split('_').join(' ')}</CardContentLabel>
         </View>
         <View style={styles.container}>
 
-              <View style={{marginBottom  :10,padding  :5,borderRadius:5}}>
-              <View style={{ flexDirection: 'row' ,marginBottom : 4}}>
-                <StyledHeadingText style={{ ...styles.textStyles, marginRight: 13 }}>Sender:</StyledHeadingText>
+
+          <View style={{ flexDirection: 'row' }}>
+
+            <View style={{ marginBottom: 10, padding: 5, flex: .4 }}>
+              <View style={{ flexDirection: 'row', marginBottom: 4 }}>
+                <MaterialIcons name="call-made" size={18} color={Colors.brand} style={styles.icon}/>
                 <StyledText style={{ color: cardColor.SENDER.textColor, fontWeight: '700' }} numberOfLines={2} ellipsizeMode={'tail'}>{listings.fromUserName}</StyledText>
               </View>
 
-              <View style={{ flexDirection: 'row',marginBottom : 4 }}>
-                <StyledHeadingText style={{ ...styles.textStyles, marginRight: 5 }}>Receiver:</StyledHeadingText>
+              <View style={{ flexDirection: 'row', marginBottom: 4 }}>
+                <MaterialIcons name="call-received" size={18} color={Colors.brand}  style={styles.icon} />
                 <StyledText style={{ color: cardColor.RECEIVER.textColor, fontWeight: '700' }} numberOfLines={2} ellipsizeMode={'tail'}>{listings.toUserName}</StyledText>
               </View>
-           </View>
 
-           <View style={{padding  :5,borderRadius:5}}>
-              <View style={{ flexDirection: 'row',marginBottom : 4 }}>
-                <StyledHeadingText style={{ ...styles.textStyles, marginRight: 5 }}>Request Date:</StyledHeadingText>
-                <StyledText style={{ color: cardColor.SENDER.textColor, fontWeight: '700' }}>{moment(  listings.timeOfTransaction).format("MMM D, YYYY") }</StyledText>
+            </View>
+
+            <View style={{ padding: 5, flex: .6 }}>
+              <View style={{ flexDirection: 'row', marginBottom: 4 }}>
+                <MaterialIcons name="date-range" size={24} color={Colors.brand}  style={styles.icon} />
+                <StyledText style={{ color: cardColor.SENDER.textColor, fontWeight: '700' }}>{moment(listings.timeOfTransaction).format("MMM D, YYYY")}</StyledText>
               </View>
 
-            <View style={{ flexDirection: 'row',}}>
-                <StyledHeadingText style={{ ...styles.textStyles, marginRight: 5 }}>Update Date:</StyledHeadingText>
-                <StyledText style={{ color: cardColor.RECEIVER.textColor, fontWeight: '700' }}>{ listings.timeOfApproval ? moment(listings.timeOfApproval) .format("MMM D, YYYY") : 'Update Awaited' }</StyledText>
+              <View style={{ flexDirection: 'row', }}>
+                <MaterialIcons name="update" size={24} color={Colors.brand}  style={styles.icon} />
+                <StyledText style={{ color: cardColor.RECEIVER.textColor, fontWeight: '700' }}>{listings.timeOfApproval ? moment(listings.timeOfApproval).format("MMM D, YYYY") : 'Update Awaited'}</StyledText>
               </View>
-           
-              </View>
+
+            </View>
+
+          </View>
+
+
+
     
 
           <Line />
@@ -161,4 +170,7 @@ flexDirection : 'row',
     alignSelf: 'center',
     marginTop: 10
   },
+  icon : {
+    marginRight : 3
+  }
 })

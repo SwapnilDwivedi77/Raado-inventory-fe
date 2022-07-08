@@ -12,28 +12,17 @@ import { logoutUser } from '../actions/users';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../Config/Colors';
 import { TouchableOpacity } from 'react-native';
-import { userLoginCall } from '../actions/userLoginAction';
-import {callNavigate} from '../navigation/callNavigate'
-import routes from '../navigation/routes';
-import {isEmpty} from '../utils/index'
+import { fetchUserPremissions } from '../actions/getUserPermissions';
 
 
 const NoPermissions = (props) => {
     const dispatch = useDispatch();
-   
     const userData = useSelector(state => state.user).userData;
-    const permissions = userData.permissions
-    useEffect(() => {
-        if(!isEmpty(userData.permissions)) {
-            callNavigate(routes.HOME,props.navigation)
-        }
-    }, [permissions])
-    
     const handleLogout = () => {
         dispatch(logoutUser());
     }
     const handlePermissionRefresh = () => {
-        dispatch(userLoginCall(userData))
+        dispatch(fetchUserPremissions(userData.userId))
     }
 
    

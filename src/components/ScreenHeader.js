@@ -16,11 +16,12 @@ import { HeaderWrapper, HeaderAction, DropdownWrapper } from './style'
 import { logoutUser } from '../actions/users';
 import { selectedProcessAction } from '../actions/selectedProcessAction'
 import {isEmpty} from '../utils/index'
+import { fetchUserPremissions } from '../actions/getUserPermissions';
 
 const ScreenHeader = (props) => {
 
   const dispatch = useDispatch();
-  const userData = useSelector(state => state.user).userData;
+  const {userData,userPermissions} = useSelector(state => state.user);
   const [permissionDropdown, setpermissionDropdown] = useState([])
 
   const handleLogout = (values) => {
@@ -31,16 +32,14 @@ const ScreenHeader = (props) => {
 
   useEffect(() => {
     let temp = []
-
-    if(!isEmpty(userData) && !isEmpty(userData.permissions)){
-     userData.permissions.forEach(({ processName }) => {
+    userPermissions.forEach(({ processName }) => {
       temp.push({ label: processLabels[processName], value: processName })
     });
     setpermissionDropdown(temp);
     dispatch(selectedProcessAction(temp[0].value))
-  }
+  
 
-  }, [userData])
+  }, [userPermissions])
 
   const [selectedValue, setSelectedValue] = useState(processDropdownList[0].value)
   const [menuVisible, setMenuVisible] = useState(false);
@@ -61,7 +60,7 @@ const ScreenHeader = (props) => {
   }
 
   const handlePermissionRefresh = () => {
-    dispatch(userLoginCall(userData))
+    dispatch(fetchUserPremissions(userData.userId))
   }
   return (
     <>
@@ -72,7 +71,7 @@ const ScreenHeader = (props) => {
             itemList={permissionDropdown}
             styles={styles.picker}
             itemStyles={styles.pickerItem} />
-             <TouchableOpacity onPress={() => {handlePermissionRefresh}} style={{marginRight:4}}>
+             <TouchableOpacity onPress={handlePermissionRefresh} style={{marginRight:4}}>
             <Ionicons name="reload-circle" size={24} color={Colors.primary} />
           </TouchableOpacity>
         </DropdownWrapper>

@@ -14,8 +14,6 @@ import {notifyMessage} from '../utils/showToast'
 
     let URL = BASE_URL + GET_TRANSACTIONS_LIST + `?toUserId=${toUserId}&status=${'CREATED'}&toProcess=${selectedProcess}`
 
-    console.log(URL)
-  
     return dispatch => {
       dispatch(fetchApprovalListInit());
 

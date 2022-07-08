@@ -54,7 +54,6 @@ const PermissionsScreen = (props) => {
 
     setSelectedUser(user)
     let temp = usersList.list.filter(obj => obj.userId === user.id)
-    console.log(temp[0].permissions)
     setpermissionList(temp[0].permissions)
 
   }

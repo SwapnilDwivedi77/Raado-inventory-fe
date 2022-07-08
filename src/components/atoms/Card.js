@@ -15,14 +15,14 @@ const Card = ({ children,style,height }) => {
 export default Card
 
 const deviceWidth = Math.round(Dimensions.get('window').width);
-const offset = 20;
+const offset = 25;
 const radius = 20;
 
 const styles = StyleSheet.create({
 
   containerStyle: {
     width: deviceWidth - offset,
-    backgroundColor: '#FFE5E2',
+    backgroundColor: Colors.primary,
     height: 280,
     borderRadius: radius,
     

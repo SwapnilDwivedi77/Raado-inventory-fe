@@ -1,5 +1,4 @@
 import axios from 'axios'
-import {listings} from '../mockData'
 import {  GET_USER_LIST_FAILED,GET_USER_LIST_INIT,GET_USER_LIST_SUCCESS} from '../constants/action'
 import {BASE_URL,GET_USER_LIST} from '../constants/urls'
 
