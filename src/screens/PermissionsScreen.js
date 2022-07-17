@@ -38,14 +38,8 @@ const PermissionsScreen = (props) => {
 
   useEffect(()=>{
 
-    let temp=[]
-
-    !isEmpty(usersList.list) && usersList.list.forEach((user) =>{
-      if(user.userId !== userData.userId) {
-        temp.push({id : user.userId,name : user.name + ',' + user.phoneNo})
-      }
-    })
-    setUserDropdownList(temp)
+    let list = getSearchableDropdownItems(userList)
+    setUserDropdownList(list)
 
 
   },[usersList])
@@ -105,7 +99,6 @@ let updatedPermission = permissionList
             getItemSelection={(user) => handleItemSelection(user)}
             items={userDropdownList}
             selectedItem={selectedUser}
-            handleUserFetch={handleUserFetch}
           />
         </View>
         <View>

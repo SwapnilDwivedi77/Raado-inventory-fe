@@ -14,66 +14,89 @@ import NumericInput from './atoms/NumericInput'
 import { processStepsMap, processLabels, processList, processFlow, processDropdownList } from '../constants/ProcessList'
 import Card from './atoms/Card'
 import Dropdown from './atoms/Dropdown'
-import { useSelector } from 'react-redux'
-import { getNewRequestEntries,} from '../utils'
+import { useDispatch, useSelector } from 'react-redux'
+import { getNewRequestEntries, isEmpty,} from '../utils'
+import { updateProductRateCall } from '../actions/updateRateAction';
+import { getProductRates } from '../actions/fetchProductRates';
 
 
 
-const ProductRatesForm = ({ handleNewRequestSubmit, loading, handleDropdownChange }) => {
+const ProductRatesForm = ({loading }) => {
 
   const { userData,userPermissions } = useSelector(state => state.user)
+  const productRates = useSelector(state => state.productRates)
   let fromUserId = userData.userId
   const usersList = useSelector(state => state.allUsers).list;
   const [selectedProcess, setselectedNextProcess] = useState(processDropdownList[0].value)
   const [filteredUsers, setFilteredUser] = useState([])
   const [selectedNextUser, setNextUser] = useState('')
+  const [globalToggle , setGlobalToggle] = useState(false)
+  const dispatch = useDispatch();
 
-
-  const [userToggle , setUserToggle] = useState(false)
-
- 
-  const userWithProcessPermissions = (nextProcess) => {
+  const fetchProductRates = (global,userId) => {
+    dispatch(getProductRates(global,{userId : userId}))
+  }
+  const userWithProcessPermissions = (process= selectedProcess,global = globalToggle) => {
     let nextUsers = []
     if (usersList.length > 0) {
       usersList.forEach((user) => {
-        if (user && user.permissions?.some((per) => per.processName === selectedProcess) && user.userId !== fromUserId) {
+        if (user && user.permissions?.some((per) => per.processName === process) && user.userId !== fromUserId) {
           let idx = processFlow.indexOf(idx + 1)
           nextUsers.push({ label: user.name, value: user.userId })
         }
       })
+      console.log(nextUsers)
       setFilteredUser(nextUsers)
-      if (nextUsers.length > 0)
+      if (!isEmpty(nextUsers))
         setNextUser(nextUsers[0].value)
+       !global && fetchProductRates(global,nextUsers[0].value);
     }
   }
 
+  useEffect(() =>{ 
+    userWithProcessPermissions(selectedProcess,globalToggle)
+    
+  },[])
+
+ 
+  
+
 
   const handleProcessSelection = (sel) => {
-    setselectedNextProcess(sel)
-    userWithProcessPermissions()
-  }
+    setselectedNextProcess(sel);
+    if (!globalToggle) {
+      userWithProcessPermissions(sel);
+    } else {
+      fetchProductRates(globalToggle);
+    }
+  };
 
   const handleUserSelection = (value, index) => {
     setNextUser(value)
+    // xconsole.log("this is rates",productRates[selec""tedProcess])
+    // fetchProductRates(globalToggle,value);
   }
 
-  const handleUserToggle = (value) => {
-        console.log(value)
-        setUserToggle(value)
-       value && userWithProcessPermissions()
+  const handleglobalToggle = (value) => {
+        setGlobalToggle(value)
+       if(!value) {   
+        userWithProcessPermissions(value)
+      } 
   }
 
   const handleFormSubmission = (values) => {
 
-    let formData = {
-      fromProcess: selectedProcess,
-      toProcess: selectedProcess,
-      status: 'CREATED',
-      entries: getNewRequestEntries(values, selectedProcess === processList.WAREHOUSE ? selectedProcess : selectedProcess),
-      fromUserId: fromUserId,
-      toUserId: selectedNextUser
+    let formData = getNewRequestEntries(values, selectedProcess === processList.WAREHOUSE ? selectedProcess : selectedProcess)
+    
+    console.log(formData)
+
+    let payload = {
+      selectedProcess: selectedProcess,
+      userId : !globalToggle ?  selectedNextUser : 'GLOBAL_RATES',
+      formData: formData
     }
-    handleNewRequestSubmit(formData)
+
+    updateProductRateCall(payload)
   }
 
   const initialValues = {
@@ -98,21 +121,21 @@ const ProductRatesForm = ({ handleNewRequestSubmit, loading, handleDropdownChang
 
             <View style={styles.rateContainer}>
                 <View style={{flex:.4,justifyContent:'center',alignItems : 'flex-end',}}>
-                <StyledHeadingText style={styles.toggleLabel}>Global Rates</StyledHeadingText>
+                <StyledHeadingText style={styles.toggleLabel}>User Rates</StyledHeadingText>
                 </View>
 
                 <View style={{flex:.2,justifyContent:'center',alignItems : 'center'}}>
                 <Switch
                         trackColor={{ false: "#767577", true: Colors.red }}
-                        thumbColor={userToggle ? Colors.brand : "#f4f3f4"}
+                        thumbColor={globalToggle ? Colors.brand : "#f4f3f4"}
                         ios_backgroundColor="#3e3e3e"
-                        onValueChange={handleUserToggle}
-                        value={userToggle}
+                        onValueChange={handleglobalToggle}
+                        value={globalToggle}
                     />
                 </View>
 
                 <View style={{flex:.4,justifyContent:'center',alignItems:'flex-start'}}>
-                <StyledHeadingText style={styles.toggleLabel}>User Rates</StyledHeadingText>
+                <StyledHeadingText style={styles.toggleLabel}>Global Rates</StyledHeadingText>
                 </View>
             </View>
 
@@ -129,7 +152,7 @@ const ProductRatesForm = ({ handleNewRequestSubmit, loading, handleDropdownChang
     
         />
       </View>
-     {userToggle && <View style={styles.pickerContainer}>
+     {!globalToggle && <View style={styles.pickerContainer}>
         <StyledInputLabel style={{ color: Colors.brand }}>Select user</StyledInputLabel>
         <Dropdown
           selectedValue={selectedNextUser}

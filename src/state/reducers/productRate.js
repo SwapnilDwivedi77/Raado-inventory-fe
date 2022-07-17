@@ -1,5 +1,5 @@
 import {
-    FTECH_G
+    FETCH_PRODUCT_RATE_INIT,FETCH_PRODUCT_RATE_FAILED,FETCH_PRODUCT_RATE_SUCCESS
    } from '../../constants/action';
    
    const initialState = {
@@ -8,21 +8,21 @@ import {
      list:[]
    };
    
-   export default function activityLogs(state = initialState, action) {
+   export default function productRates(state = initialState, action) {
      switch (action.type) {
-       case FETCH_LOGS_INIT:
+       case FETCH_PRODUCT_RATE_INIT:
          return {
            ...state,
            loading: true
          };
-       case FETCH_LOGS_SUCCESS:
+       case FETCH_PRODUCT_RATE_SUCCESS:
          return {
            ...state,
            loading: false,
            success : true,
            list : action.payload
          };
-       case FETCH_LOGS_FAILURE:
+       case FETCH_PRODUCT_RATE_FAILED:
          return {
            ...state,
            loading: false,

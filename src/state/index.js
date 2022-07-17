@@ -9,6 +9,7 @@ import postNewRequest from './reducers/postNewRequest'
 import allUsers from './reducers/allUser'
 import updateUserPermission from './reducers/updatePermission'
 import approveTrxn from './reducers/approveTrxn'
+import productRates from './reducers/productRate';
 
 export default combineReducers({ 
     user:userLogin,
@@ -20,5 +21,6 @@ export default combineReducers({
     postNewRequest : postNewRequest,
     allUsers : allUsers,
     updatePermission  : updateUserPermission,
-    approveTrxn:approveTrxn
+    approveTrxn:approveTrxn,
+    productRates  :productRates
 });

@@ -80,9 +80,6 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) =>
   const handleNextProcessSelection = (sel) => {
     setselectedNextProcess(sel)
     findUserdWithNextPermissions(sel)
-    let renderProcess = sel === processList.WAREHOUSE ? sel : sel
-    setFormRender(renderProcess)
-
   }
 
   const handleUserSelection = (value, index) => {
