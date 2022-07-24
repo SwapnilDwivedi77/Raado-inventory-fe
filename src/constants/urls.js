@@ -12,4 +12,4 @@ export const GET_USER_PERMISSION = '/user/getUserById'
 export const UPADATE_USER_RATES = '/user/{processName}/updateUserRate'
 
 export const GET_GLOBAL_RATES = '/staticResource/getGlobalRates'
-export const GET_USER_RATES = '/user/getUserById'
+export const GET_USER_RATES = '/user/getUserRates'

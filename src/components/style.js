@@ -17,10 +17,11 @@ export const Colors = {
     green: '#00B2B9',
     textBlue: '#009FC5',
     red: '#E87060',
-    light : '#edf8f5',
+    light : '#fff2f0',
     dark : '#6A0D01'
 
 }
+
 
 const { primary, secondary, tertiary, darkLight, brand, green, red, textBlue,light,dark } = Colors
 
@@ -183,9 +184,8 @@ margin: 15px 0 0 auto;
 export const DropdownWrapper = styled.View`
     border-width: 2px;
     border-radius: 10px;
-    border-color:${Colors.primary};
+    border-color:${Colors.dark};
     color: ${Colors.primary};
-    background-color:${Colors.brand};
     font-weight : 400;
     letter-spacing : 1.1px;
     height: 45px ;
@@ -247,5 +247,15 @@ letter-spacing: 1px ;
 export const StyledText = styled.Text`
 font-size: 12px ;
 letter-spacing: 1px ;
-flex : 1;
+color : ${brand};
+text-transform: capitalize;
+`
+
+export const CardHeading = styled.Text`
+
+font-size : 14px;
+font-weight : bold;
+letter-spacing: 1px;
+text-align : center;
+margin : auto;
 `

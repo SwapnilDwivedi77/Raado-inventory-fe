@@ -12,7 +12,7 @@ import DropdownSearchable from '../components/atoms/DropdownSearchable'
 import { getAllUserCall } from '../actions/getAllUserAction'
 import { updateUserPermissionCall } from '../actions/updatePermissionAction'
 import SafeAreaView from '../components/atoms/SafeAreaView'
-import { isEmpty } from '../utils'
+import { getSearchableDropdownItems, isEmpty } from '../utils'
 import PermissionList from '../components/PermissionList'
 
 
@@ -37,9 +37,11 @@ const PermissionsScreen = (props) => {
   }, [])
 
   useEffect(()=>{
-
-    let list = getSearchableDropdownItems(userList)
-    setUserDropdownList(list)
+    
+   if(!isEmpty(usersList.list)) {
+     let list = getSearchableDropdownItems(usersList.list,userData.userId);
+     setUserDropdownList(list)
+   }
 
 
   },[usersList])
@@ -90,9 +92,9 @@ let updatedPermission = permissionList
 
 
   return (
-
+    
     <SafeAreaView>
-      
+        <ScrollView>
       <View style={{width: '80%', position: 'absolute',
           zIndex: 9999,marginLeft : 30,}}>
           <DropdownSearchable
@@ -142,8 +144,9 @@ let updatedPermission = permissionList
             onPress={handleSubmit}
             icon={<Ionicons name="arrow-forward" size={34} color={Colors.primary} />}
           />}
-     
+          </ScrollView>
     </SafeAreaView>
+    
   )
 }
 
@@ -152,7 +155,7 @@ export default PermissionsScreen
 const styles = StyleSheet.create({
   container: {
 
-marginTop : 25
+marginTop : 25,
 
   },
 

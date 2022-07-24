@@ -13,23 +13,21 @@ import { notifyMessage } from '../utils/showToast';
 
  export const getProductRates = (globalRate , params) => {
 
+
     let URL = BASE_URL;
     if (globalRate) {
       URL += GET_GLOBAL_RATES;
     } else {
-      URL += GET_USER_RATES + `?userId=${params.userId}`;
-    } 
-
-    console.log(globalRate,URL);
+      URL += GET_USER_RATES + `?userId=${params.id}`;
+    }
+    console.log(URL) 
     return dispatch => {
       dispatch(fetchProductRatesInit());
 
       axios
         .get(URL)
         .then(res => {
-            let data = globalRate ? res.data.data : res.data.data.permissions
-            console.log(data)
-          dispatch(fetchProductRatesSuccess(data));
+          dispatch(fetchProductRatesSuccess(res.data.data));
         })
         .catch(err => {
           dispatch(fetchProductRatesFailed());

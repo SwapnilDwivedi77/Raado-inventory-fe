@@ -17,7 +17,7 @@ const headerStyles = {
   headerTintColor: Colors.brand,
   headerStyle: {
     borderBottomWidth: 0,
-    backgroundColor: Colors.brand,
+    // backgroundColor: Colors.brand,
     shadowColor: '#000',
     shadowOpacity: 0.25,
     shadowRadius: 20,
