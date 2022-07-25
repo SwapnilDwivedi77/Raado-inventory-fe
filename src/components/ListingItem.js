@@ -23,7 +23,7 @@ const ListingItem = ({ listings,loading, isApprovalTab = false, handleApproval,.
   }
   return (
     <View>
-      <Card height={isApprovalTab ? 260  : 240}>
+      <Card height={isApprovalTab ? 255  : 225}>
 
       <View style={styles.container}>
 
@@ -81,12 +81,12 @@ const ListingItem = ({ listings,loading, isApprovalTab = false, handleApproval,.
     {Object.keys(listings.entries).map((item, index) => {
       return (
         <View key={index} style={styles.quantity}>
-          <View style={{ flex: .4, alignItems: 'center',paddingBottom:0,}}>
+          <View style={{ alignItems: 'center',}}>
             <StyledText style={{ fontSize: 16, fontWeight: "800", textAlign: 'center',color :Colors.dark, }}>{cardStepsLabel[item]?.toUpperCase()}</StyledText>
           </View>
-          <View style={{ flex: .6, justifyContent: 'center', alignItems: 'center',flexDirection: 'row'}}>
+          <View style={{justifyContent: 'center', alignItems: 'center',flexDirection: 'row'}}>
             <StyledText style={{ fontSize: 44,color :Colors.brand }}>{listings.entries[item]}</StyledText>
-            <StyledText style={{ fontSize: 10,color :Colors.dark,fontWeight: 'bold',marginTop:35}}>kgs</StyledText>
+            <Text style={{ fontSize: 10,color :Colors.dark,fontWeight: 'bold',marginTop:35}}>kgs</Text>
          
              </View>
              
@@ -104,7 +104,7 @@ const ListingItem = ({ listings,loading, isApprovalTab = false, handleApproval,.
 
         
 
-              {/* {loading && <ActivityIndicator/>} */}
+         {loading && <ActivityIndicator/>}
          
         {isApprovalTab && !loading && <View style={styles.status}>
          
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   },
 
   product: {
-    flex: 1,
+    flex: .5,
     flexDirection :'row',
     alignItems: 'stretch',
     justifyContent: 'space-evenly',
@@ -163,8 +163,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     width: '100%',
-    marginBottom:0,
-    borderRadius: 10,
+    position : 'absolute',
+    marginTop : 220
   },
 
   statusColor: {
@@ -190,6 +190,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     height: '45%',
+    flex : .45
   },
   sender: {
     flex: 0.45,
@@ -212,7 +213,6 @@ const styles = StyleSheet.create({
     marginTop: 3
   },
   quantity: {
-    margin: 1,
     paddingRight : 5,
     paddingLeft : 5,
   },

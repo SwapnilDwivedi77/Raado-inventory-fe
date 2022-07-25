@@ -98,6 +98,14 @@ const ScreenHeader = (props) => {
                   </MenuItem>
                 <MenuDivider color={Colors.brand} />
 
+                <MenuItem onPress={() => handleMenuNavigation(routes.REPORT)}>
+            <View style={styles.menuItemWrapper}>
+              <MaterialIcons name="analytics" size={24} color={Colors.brand} />
+            <Text>
+              Reports</Text>
+              </View>
+              </MenuItem>
+              <MenuDivider color={Colors.brand} />
                 <MenuItem onPress={() => handleMenuNavigation(routes.RATES)}>
                 <View style={styles.menuItemWrapper}>
                 <FontAwesome name="rupee" size={24} color={Colors.brand} />

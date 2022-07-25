@@ -1,5 +1,5 @@
 import React from 'react'
-import {Text} from 'react-native'
+import {Text,StyleSheet,View} from 'react-native'
 import { createStackNavigator } from '@react-navigation/stack'
 
 import PermissionsScreen from '../screens/PermissionsScreen'
@@ -11,6 +11,7 @@ import {Colors} from '../Config/Colors'
 import ProfileScreen from '../screens/ProfileScreen'
 import ScreenHeader from '../components/ScreenHeader'
 import { TouchableOpacity } from 'react-native';
+import ReportsScreen from '../screens/ReportsScreen'
 const Stack = createStackNavigator();
 
 const headerStyles = {
@@ -57,7 +58,7 @@ const PostLoginNavigator = () => {
      />
     <Stack.Screen name={routes.PERMISSIONS} component={PermissionsScreen}
     options={({ navigation }) => ({
-      headerTitle: (props) => <Text>Manage Permissions</Text>,
+      headerTitle: (props) => <Text style={styles.headerTitle}>Manage Permissions</Text>,
       headerLeft: (props) => (
         <BackButton navigation={navigation}/>
       ),   
@@ -66,7 +67,7 @@ const PostLoginNavigator = () => {
     />
     <Stack.Screen name={routes.PROFILE} component={ProfileScreen}
     options={({ navigation }) => ({
-      headerTitle: (props) => <Text>Profile</Text>,
+      headerTitle: (props) => <Text style={styles.headerTitle}>Profile</Text>,
       headerLeft: (props) => (
         <BackButton navigation={navigation}/>
       ),
@@ -75,7 +76,17 @@ const PostLoginNavigator = () => {
     />
      <Stack.Screen name={routes.RATES} component={ProductRatesScreen}
     options={({ navigation }) => ({
-      headerTitle: (props) => <Text>Product rates</Text>,
+      headerTitle: (props) => <Text style={styles.headerTitle}>Product rates</Text>,
+      headerLeft: (props) => (
+        <BackButton navigation={navigation}/>
+      ),
+      ...stackHeader
+  })}
+    />
+
+   <Stack.Screen name={routes.REPORT} component={ReportsScreen}
+    options={({ navigation }) => ({
+      headerTitle: (props) => <Text style={styles.headerTitle}>Analytics</Text>,
       headerLeft: (props) => (
         <BackButton navigation={navigation}/>
       ),
@@ -88,3 +99,12 @@ const PostLoginNavigator = () => {
 }
 
 export default PostLoginNavigator
+
+const styles = StyleSheet.create({
+  headerTitle : {
+    color : Colors.primary,
+    fontSize : 18,
+    fontWeight : 'bold',
+    marginRight : 'auto',
+  }
+})

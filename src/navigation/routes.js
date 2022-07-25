@@ -9,7 +9,8 @@ export default Object.freeze({
    HOME:'HOME',
    PROFILE : 'PROFILE',
    NO_ACCESS : 'NO_ACCESS',
-   RATES:'RATES'
+   RATES:'RATES',
+   REPORT : 'REPORT'
 
 
 });
