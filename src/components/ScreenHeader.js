@@ -24,6 +24,7 @@ const ScreenHeader = (props) => {
   const {userData,userPermissions} = useSelector(state => state.user);
   const [permissionDropdown, setpermissionDropdown] = useState([])
 
+  const [selectedValue, setSelectedValue] = useState(processDropdownList[0].value)
   const handleLogout = (values) => {
     hideMenu()
     dispatch(logoutUser(values));
@@ -36,12 +37,12 @@ const ScreenHeader = (props) => {
       temp.push({ label: processLabels[processName], value: processName })
     });
     setpermissionDropdown(temp);
+    setSelectedValue(temp[0].value)
     dispatch(selectedProcessAction(temp[0].value))
   
 
   }, [userPermissions])
 
-  const [selectedValue, setSelectedValue] = useState(processDropdownList[0].value)
   const [menuVisible, setMenuVisible] = useState(false);
 
   const isAdmin = useSelector(state => state.user).userData.admin
@@ -98,14 +99,7 @@ const ScreenHeader = (props) => {
                   </MenuItem>
                 <MenuDivider color={Colors.brand} />
 
-                <MenuItem onPress={() => handleMenuNavigation(routes.REPORT)}>
-            <View style={styles.menuItemWrapper}>
-              <MaterialIcons name="analytics" size={24} color={Colors.brand} />
-            <Text>
-              Reports</Text>
-              </View>
-              </MenuItem>
-              <MenuDivider color={Colors.brand} />
+                
                 <MenuItem onPress={() => handleMenuNavigation(routes.RATES)}>
                 <View style={styles.menuItemWrapper}>
                 <FontAwesome name="rupee" size={24} color={Colors.brand} />
@@ -118,6 +112,14 @@ const ScreenHeader = (props) => {
                 <MenuDivider color={Colors.brand} />
               </>
             }
+            <MenuItem onPress={() => handleMenuNavigation(routes.ANALYTICS)}>
+            <View style={styles.menuItemWrapper}>
+              <MaterialIcons name="analytics" size={24} color={Colors.brand} />
+            <Text>
+              Reports</Text>
+              </View>
+              </MenuItem>
+              <MenuDivider color={Colors.brand} />
             <MenuItem onPress={() => handleMenuNavigation(routes.PROFILE)}>
             <View style={styles.menuItemWrapper}>
               <MaterialIcons name="account-circle" size={24} color={Colors.brand} />
@@ -127,6 +129,8 @@ const ScreenHeader = (props) => {
               </MenuItem>
               
             <MenuDivider color={Colors.brand} />
+
+            
             <MenuItem onPress={handleLogout}>
             <View style={styles.menuItemWrapper}>
               <MaterialCommunityIcons name="logout" size={24} color={Colors.brand} />

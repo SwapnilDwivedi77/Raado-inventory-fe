@@ -10,7 +10,10 @@ export default Object.freeze({
    PROFILE : 'PROFILE',
    NO_ACCESS : 'NO_ACCESS',
    RATES:'RATES',
-   REPORT : 'REPORT'
+   ANALYTICS : 'ANALYTICS',
+   USER_REPORT : 'USER_REPORT',
+   PROCESS_REPORT : 'PROCESS_REPORT',
+
 
 
 });

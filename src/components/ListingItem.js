@@ -33,11 +33,11 @@ const ListingItem = ({ listings,loading, isApprovalTab = false, handleApproval,.
           <CardHeading numberOfLines={1}>{listings.fromProcess.split('_').join(' ')}</CardHeading>
           </View>  
               <View style={{...styles.content,alignItems: 'flex-end'}}>
-               <Text>{sentenceCase(listings.fromUserName)}</Text>
+               <Text>{listings.fromUserName}</Text>
             </View> 
 
             <View style={{...styles.content,alignItems: 'flex-end'}}>
-            <Text style={{ color: Colors.textBlue, fontWeight: '500' }}>{listings.timeOfTransaction ? moment(listings.timeOfTransaction).format("HH:mm,MMM D,YYYY") : 'Update Awaited'}</Text>
+            <Text style={{ color: Colors.textBlue, fontWeight: '500' }}>{listings.timeOfTransaction ? moment(listings.timeOfTransaction).format("HH:mm,MMM D YYYY") : 'Update Awaited'}</Text>
               
             </View> 
             
@@ -60,11 +60,11 @@ const ListingItem = ({ listings,loading, isApprovalTab = false, handleApproval,.
         
         </View>
         <View style={{...styles.content,alignItems: 'flex-start'}}>
-               <Text>{sentenceCase(listings.toUserName)}</Text>
+               <Text>{listings.toUserName}</Text>
             </View> 
 
             <View style={{...styles.content,alignItems: 'flex-start'}}>
-            <Text style={{ color: Colors.textBlue, fontWeight: '500' }}>{listings.timeOfApproval ? moment(listings.timeOfApproval).format("HH:mm,MMM D,YYYY") : 'Update Awaited'}</Text>
+            <Text style={{ color: Colors.textBlue, fontWeight: '500' }}>{listings.timeOfApproval ? moment(listings.timeOfApproval).format("HH:mm,MMM D YYYY") : 'Update Awaited'}</Text>
               
             </View> 
         

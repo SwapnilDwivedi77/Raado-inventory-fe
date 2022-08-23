@@ -15,7 +15,7 @@ import { processStepsMap, processLabels, processList, processFlow } from '../con
 import Card from './atoms/Card'
 import Dropdown from './atoms/Dropdown'
 import { useSelector } from 'react-redux'
-import { getNewRequestEntries,} from '../utils'
+import { getNewRequestEntries, isEmpty,} from '../utils'
 
 
 
@@ -24,17 +24,24 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) =>
   const { userData,userPermissions } = useSelector(state => state.user)
   let fromUserId = userData.userId
   const usersList = useSelector(state => state.allUsers).list;
-  const [selectedNextProcess, setselectedNextProcess] = useState(processList.WAREHOUSE)
+  const [selectedNextProcess, setselectedNextProcess] = useState()
   const [nextProcessOptions, setNextProcessOptions] = useState([])
   const [filteredUsers, setFilteredUser] = useState([])
   const [selectedNextUser, setNextUser] = useState('')
   const [isWrite, setIsWrite] = useState(false)
 
+  const checkPermissionExists = (permissions, process) => {
+    let temp = [];
+    temp = permissions.filter((per) => per.processName === process && per.write);
+
+    return temp.length
+  };
+
   const findUserdWithNextPermissions = (nextProcess) => {
     let nextUsers = []
     if (usersList.length > 0) {
       usersList.forEach((user) => {
-        if (user && user.permissions?.some((per) => per.processName === nextProcess) && user.userId !== fromUserId) {
+        if (user && checkPermissionExists(user.permissions , nextProcess) && user.userId !== fromUserId) {
           let idx = processFlow.indexOf(idx + 1)
           nextUsers.push({ label: user.name, value: user.userId })
         }
@@ -47,7 +54,7 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) =>
   const findNextProcessForUser = () => {
 
     let nextProcess = []
-    if (selectedProcess == processList.WAREHOUSE) {
+    if (selectedProcess === processList.WAREHOUSE) {
       processFlow.forEach((pre) => {
         nextProcess.push({ label: processLabels[pre], value: pre })
 
@@ -60,7 +67,8 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) =>
     else {
       let idx = processFlow.indexOf(selectedProcess)
       nextProcess = processFlow[idx + 1]
-      setNextProcessOptions([{ label: processLabels[nextProcess], value: nextProcess }, { label: processLabels.WAREHOUSE, value: processList.WAREHOUSE }])
+      setNextProcessOptions([{ label: processLabels[nextProcess], value: nextProcess }, { label: processLabels.WAREHOUSE, value: processList.WAREHOUSE },])
+      setselectedNextProcess(nextProcess)
       findUserdWithNextPermissions(nextProcess)
     }
 
@@ -69,12 +77,20 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) =>
   useEffect(() => {
 
     findNextProcessForUser()
-
+    console.log('selected process',selectedProcess)
     let write = true;
     write = userPermissions.filter((per) => per.processName === selectedProcess)[0].write
     setIsWrite(write)
 
   }, [selectedProcess])
+
+  useEffect(() => {
+    console.log({selectedNextProcess})
+    if(!isEmpty(selectedNextProcess) && !isEmpty(usersList))
+     {
+      findUserdWithNextPermissions(selectedNextProcess)
+     }
+  },[usersList])
 
 
   const handleNextProcessSelection = (sel) => {
@@ -116,7 +132,7 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) =>
 
   return (
     <>
-
+      
       <View style={styles.pickerContainer}>
         <StyledInputLabel style={{ color: Colors.brand }}>Select next Process</StyledInputLabel>
         <Dropdown

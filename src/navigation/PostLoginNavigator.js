@@ -12,6 +12,7 @@ import ProfileScreen from '../screens/ProfileScreen'
 import ScreenHeader from '../components/ScreenHeader'
 import { TouchableOpacity } from 'react-native';
 import ReportsScreen from '../screens/ReportsScreen'
+import AnalyticsForm from '../components/AnalyticsForm'
 const Stack = createStackNavigator();
 
 const headerStyles = {
@@ -50,52 +51,86 @@ const BackButton = ({navigation}) => {
 const PostLoginNavigator = () => {
   return (
     <Stack.Navigator mode="card">
-     <Stack.Screen name={routes.HOME} component={HomeTabNavigator} 
-      options={({ navigation }) => ({
-        headerTitle: (props) => <ScreenHeader {...navigation} />,
-        ...headerStyles
-    })}
-     />
-    <Stack.Screen name={routes.PERMISSIONS} component={PermissionsScreen}
-    options={({ navigation }) => ({
-      headerTitle: (props) => <Text style={styles.headerTitle}>Manage Permissions</Text>,
-      headerLeft: (props) => (
-        <BackButton navigation={navigation}/>
-      ),   
-      ...stackHeader
-  })}
-    />
-    <Stack.Screen name={routes.PROFILE} component={ProfileScreen}
-    options={({ navigation }) => ({
-      headerTitle: (props) => <Text style={styles.headerTitle}>Profile</Text>,
-      headerLeft: (props) => (
-        <BackButton navigation={navigation}/>
-      ),
-      ...stackHeader
-  })}
-    />
-     <Stack.Screen name={routes.RATES} component={ProductRatesScreen}
-    options={({ navigation }) => ({
-      headerTitle: (props) => <Text style={styles.headerTitle}>Product rates</Text>,
-      headerLeft: (props) => (
-        <BackButton navigation={navigation}/>
-      ),
-      ...stackHeader
-  })}
-    />
+      <Stack.Screen
+        name={routes.HOME}
+        component={HomeTabNavigator}
+        options={({ navigation }) => ({
+          headerTitle: (props) => <ScreenHeader {...navigation} />,
+          ...headerStyles,
+        })}
+      />
+      <Stack.Screen
+        name={routes.PERMISSIONS}
+        component={PermissionsScreen}
+        options={({ navigation }) => ({
+          headerTitle: (props) => (
+            <Text style={styles.headerTitle}>Manage Permissions</Text>
+          ),
+          headerLeft: (props) => <BackButton navigation={navigation} />,
+          ...stackHeader,
+        })}
+      />
+      <Stack.Screen
+        name={routes.PROFILE}
+        component={ProfileScreen}
+        options={({ navigation }) => ({
+          headerTitle: (props) => (
+            <Text style={styles.headerTitle}>Profile</Text>
+          ),
+          headerLeft: (props) => <BackButton navigation={navigation} />,
+          ...stackHeader,
+        })}
+      />
+      <Stack.Screen
+        name={routes.RATES}
+        component={ProductRatesScreen}
+        options={({ navigation }) => ({
+          headerTitle: (props) => (
+            <Text style={styles.headerTitle}>Product rates</Text>
+          ),
+          headerLeft: (props) => <BackButton navigation={navigation} />,
+          ...stackHeader,
+        })}
+      />
 
-   <Stack.Screen name={routes.REPORT} component={ReportsScreen}
-    options={({ navigation }) => ({
-      headerTitle: (props) => <Text style={styles.headerTitle}>Analytics</Text>,
-      headerLeft: (props) => (
-        <BackButton navigation={navigation}/>
-      ),
-      ...stackHeader
-  })}
-    />
+      <Stack.Screen
+        name={routes.ANALYTICS}
+
+        options={({ navigation }) => ({
+          headerTitle: (props) => (
+            <Text style={styles.headerTitle}>Analytics</Text>
+          ),
+          headerLeft: (props) => <BackButton navigation={navigation} />,
+          ...stackHeader,
+        })} >
+      
+        {props => <ReportsScreen {...props}/>}
+        </Stack.Screen>
+      <Stack.Screen
+        name={routes.USER_REPORT}
+        component={AnalyticsForm}
+        options={({ navigation }) => ({
+          headerTitle: (props) => (
+            <Text style={styles.headerTitle}>User Reports</Text>
+          ),
+          headerLeft: (props) => <BackButton navigation={navigation} />,
+          ...stackHeader,
+        })}
+      />
+
+<Stack.Screen
+        name={routes.PROCESS_REPORT}
+        component={AnalyticsForm}
+        options={({ navigation }) => ({
+          headerTitle: (props) => (
+            <Text style={styles.headerTitle}>Process Reports</Text>
+          ),
+          headerLeft: (props) => <BackButton navigation={navigation} />,
+          ...stackHeader,
+        })}
+      />
     </Stack.Navigator>
-
-  )
+  );
 }
 
 export default PostLoginNavigator

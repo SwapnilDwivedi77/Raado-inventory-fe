@@ -114,13 +114,13 @@ let updatedPermission = permissionList
         {usersList.loading && <ActivityIndicator size={'small'} />}
 
           <View style={styles.heading}>
-            <View style={{ flex: .3 }}>
+            <View style={{ flex: .2 }}>
               <StyledHeadingText style={{ ...styles.textStyles, marginRight: 13 }}>Select</StyledHeadingText>
             </View>
             <View style={{ flex: .4, justifyContent: 'center', alignItems: 'center' }}>
               <StyledHeadingText style={{ ...styles.textStyles, marginRight: 13 }}>Process</StyledHeadingText>
             </View>
-            <View style={{ flex: .3 }}>
+            <View style={{ flex: .4,alignItems: 'center'}}>
               <StyledHeadingText style={{ ...styles.textStyles, marginRight: 13 }}>Write Access</StyledHeadingText>
             </View>
           </View>
@@ -153,7 +153,7 @@ export default PermissionsScreen
 
 const styles = StyleSheet.create({
   container: {
-
+    flex: 1,
     marginTop : 25,
 
   },
@@ -180,7 +180,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.textBlue,
     width: 100,
     height: 100,
-    alignSelf: 'center',
-    marginTop: 5
+   position : 'absolute',
+   bottom: 25,
+   right : '40%',
   },
 })

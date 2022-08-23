@@ -153,8 +153,6 @@ const ProductRatesForm = () => {
       formData: formData,
     };
 
-    console.log('Payload for api action',payload)
-
     dispatch(updateProductRateCall(payload));
   };
 
