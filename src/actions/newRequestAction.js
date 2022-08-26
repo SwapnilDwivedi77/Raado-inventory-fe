@@ -17,7 +17,7 @@ import {getActivityLogsCall} from './fetchLogsAction'
  export const newRequestCall = (requestData,selectedProcess) => {
 
     let URL = BASE_URL + POST_NEW_REQUEST
-
+console.log(requestData)
     return dispatch => {
       dispatch(postNewREquestInit());
       axios

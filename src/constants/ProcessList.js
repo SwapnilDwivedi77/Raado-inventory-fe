@@ -6,7 +6,8 @@ export const processList = Object.freeze({
     SIZING_AND_POLISHING: 'SIZING_AND_POLISHING',
     SORTING: 'SORTING',
     PRODUCT: 'PRODUCT',
-    WAREHOUSE: 'WAREHOUSE'
+    WAREHOUSE: 'WAREHOUSE',
+    TRANSPORT : 'TRANSPORT'
 })
 
 export const processDropdownList = [ 
@@ -18,6 +19,7 @@ export const processDropdownList = [
     { label: 'Sorting and Packeging', value: processList.SORTING },
     { label: 'Finished Product', value: processList.PRODUCT },
     { label: 'Warehouse', value: processList.WAREHOUSE },
+    { label: 'Transport', value: processList.TRANSPORT },
 ]
 
 export const processLabels = {
@@ -29,6 +31,7 @@ export const processLabels = {
     [processList.SORTING]: 'Sorting and Packeging',
     [processList.PRODUCT]: 'Finished Product',
     [processList.WAREHOUSE]: 'Warehouse',
+    [processList.TRANSPORT] : 'Transport'
 }
 
 export const cardStepsLabel = {

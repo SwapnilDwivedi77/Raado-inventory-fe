@@ -13,20 +13,20 @@ const  updateProductRateSuccess = () => ({ type : UPDATE_PRODUCT_RATE_SUCCESS})
 
  export const updateProductRateCall = (payload) => {
 
-    let URL ='/'+ BASE_URL + UPADATE_USER_RATES.replace('{processName}',payload.selectedProcess) + `?userId=${payload.userId}`
+    let URL = BASE_URL + UPADATE_USER_RATES.replace('{processName}',payload.selectedProcess) + `?userId=${payload.userId}`
 
-    console.log('URL',URL)
+    console.log('This is url for rates update',URL)
+
     return dispatch => {
       dispatch(updateProductRateInit());
       axios
-      .post(URL, payload.formData)
+      .patch(URL,payload.formData)
       .then(res => {
         dispatch(updateProductRateSuccess());
         notifyMessage('Rates Updated!')
         })
       .catch(err => {
         dispatch(updateProductRateFailed(err.message));
-     console.log(err)
         notifyMessage('Something went wrong')
       });
      

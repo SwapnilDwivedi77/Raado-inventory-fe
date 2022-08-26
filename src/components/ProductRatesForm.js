@@ -1,66 +1,116 @@
-import { StyleSheet, View, ActivityIndicator , Switch} from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { Formik } from 'formik'
-import RoundButton from './atoms/RoundButton'
+import { StyleSheet, View, ActivityIndicator, Switch } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Formik } from 'formik';
+import RoundButton from './atoms/RoundButton';
 import { Ionicons } from '@expo/vector-icons';
 import {
   Colors,
   RequestFormWrapper,
-  StyledInputLabel, StyledHeadingText, TextLinkContent,
-} from './style'
+  StyledInputLabel,
+  StyledHeadingText,
+  TextLinkContent,
+} from './style';
 
-
-import NumericInput from './atoms/NumericInput'
-import { processStepsMap, processLabels, processList, processFlow, processDropdownList } from '../constants/ProcessList'
-import Card from './atoms/Card'
-import Dropdown from './atoms/Dropdown'
-import { useDispatch, useSelector } from 'react-redux'
-import { getNewRequestEntries, isEmpty,} from '../utils'
+import NumericInput from './atoms/NumericInput';
+import {
+  processStepsMap,
+  processLabels,
+  processList,
+  processFlow,
+  processDropdownList,
+} from '../constants/ProcessList';
+import Card from './atoms/Card';
+import Dropdown from './atoms/Dropdown';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  getNewRequestEntries,
+  getSearchableDropdownItems,
+  isEmpty,
+} from '../utils';
 import { updateProductRateCall } from '../actions/updateRateAction';
 import { getProductRates } from '../actions/fetchProductRates';
+import DropdownSearchable from './atoms/DropdownSearchable';
+import ScreenLoader from './atoms/ScreenLoader';
 
+const initialValues = {
+  bambooWt: '',
+  bambooUnits: '',
+  knotWt: '',
+  splitWt: '',
+  sliverWt: '',
+  filamentWt: '',
+  sawDustWt: '',
+  returnedSliverWt: '',
+  polishedSticksWt: '',
+  size: '',
+  quantity: '',
+  finishedProductWt: '',
+};
 
-
-const ProductRatesForm = ({loading }) => {
-
-  const { userData,userPermissions } = useSelector(state => state.user)
-  const productRates = useSelector(state => state.productRates)
-  let fromUserId = userData.userId
-  const usersList = useSelector(state => state.allUsers).list;
-  const [selectedProcess, setselectedNextProcess] = useState(processDropdownList[0].value)
-  const [filteredUsers, setFilteredUser] = useState([])
-  const [selectedNextUser, setNextUser] = useState('')
-  const [globalToggle , setGlobalToggle] = useState(false)
+const ProductRatesForm = () => {
+  const { userData, userPermissions } = useSelector((state) => state.user);
+  const { list: productRates, loading: loadRates , updateRate : updateRate } = useSelector(
+    (state) => state.productRates,
+  );
+  const usersList = useSelector((state) => state.allUsers).list;
+  const [selectedProcess, setselectedNextProcess] = useState(
+    processDropdownList[0].value,
+  );
+  const [filteredUsers, setFilteredUser] = useState([]);
+  const [selectedNextUser, setNextUser] = useState('');
+  const [globalToggle, setGlobalToggle] = useState(false);
+  const [formState, setFormState] = useState(initialValues);
   const dispatch = useDispatch();
+  let fromUserId = userData.userId;
 
-  const fetchProductRates = (global,userId) => {
-    dispatch(getProductRates(global,{userId : userId}))
-  }
-  const userWithProcessPermissions = (process= selectedProcess,global = globalToggle) => {
-    let nextUsers = []
+  const fetchProductRates = (global, user) => {
+    dispatch(getProductRates(global, user));
+  };
+  const userWithProcessPermissions = (
+    process = selectedProcess,
+    global = globalToggle,
+  ) => {
+    let nextUsers = [];
     if (usersList.length > 0) {
       usersList.forEach((user) => {
-        if (user && user.permissions?.some((per) => per.processName === process) && user.userId !== fromUserId) {
-          let idx = processFlow.indexOf(idx + 1)
-          nextUsers.push({ label: user.name, value: user.userId })
+        if (
+          user &&
+          user.permissions?.some((per) => per.processName === process) &&
+          user.userId !== fromUserId
+        ) {
+          let idx = processFlow.indexOf(idx + 1);
+          nextUsers.push(user);
         }
-      })
-      console.log(nextUsers)
-      setFilteredUser(nextUsers)
-      if (!isEmpty(nextUsers))
-        setNextUser(nextUsers[0].value)
-       !global && fetchProductRates(global,nextUsers[0].value);
+      });
+      if (!isEmpty(nextUsers)) {
+        let list = getSearchableDropdownItems(nextUsers, userData.userId);
+        console.log(list)
+        setFilteredUser(list);
+      }
     }
-  }
+  };
 
-  useEffect(() =>{ 
-    userWithProcessPermissions(selectedProcess,globalToggle)
-    
-  },[])
+  const getFormStateFromData = (obj) => {
+   let state = {} 
+  !isEmpty(obj) && Object.keys(obj).forEach(key => state[key] = obj[key].toString())
+   console.log('this is processed state',state)
+    return state;
+  };
 
- 
-  
+  useEffect(() => {
+    userWithProcessPermissions(selectedProcess, globalToggle);
+  }, []);
 
+  useEffect(() => {
+    let formState={}
+    if(!globalToggle && isEmpty(selectedNextUser)) 
+       formState = initialValues
+    else if (!isEmpty(productRates)) {
+      formState = productRates[selectedProcess];  
+    }
+
+    setFormState(getFormStateFromData(formState));
+  }, [productRates]);
 
   const handleProcessSelection = (sel) => {
     setselectedNextProcess(sel);
@@ -71,122 +121,128 @@ const ProductRatesForm = ({loading }) => {
     }
   };
 
-  const handleUserSelection = (value, index) => {
-    setNextUser(value)
-    // xconsole.log("this is rates",productRates[selec""tedProcess])
-    // fetchProductRates(globalToggle,value);
-  }
+  const handleUserSelection = (value) => {
+    setNextUser(value);
+    fetchProductRates(globalToggle, value);
+  };
 
   const handleglobalToggle = (value) => {
-        setGlobalToggle(value)
-       if(!value) {   
-        userWithProcessPermissions(value)
-      } 
-  }
+    setGlobalToggle(value);
+    setNextUser({})
+    if (value) {
+      fetchProductRates(value);
+    }
+    else {
+      setFormState(initialValues)
+    }
+  };
 
   const handleFormSubmission = (values) => {
+    let formData = getNewRequestEntries(
+      values,
+      selectedProcess === processList.WAREHOUSE
+        ? selectedProcess
+        : selectedProcess,
+    );
 
-    let formData = getNewRequestEntries(values, selectedProcess === processList.WAREHOUSE ? selectedProcess : selectedProcess)
-    
-    console.log(formData)
+    console.log('This is formData',formData);
 
     let payload = {
       selectedProcess: selectedProcess,
-      userId : !globalToggle ?  selectedNextUser : 'GLOBAL_RATES',
-      formData: formData
-    }
+      userId: !globalToggle ? selectedNextUser.id : 'GLOBAL_RATES',
+      formData: formData,
+    };
 
-    updateProductRateCall(payload)
-  }
-
-  const initialValues = {
-    bambooWt: '',
-    bambooUnits: '',
-    knotWt: '',
-    splitWt: '',
-    sliverWt: '',
-    filamentWt: '',
-    sawDustWt: '',
-    returnedSliverWt: '',
-    polishedSticksWt: '',
-    size: '',
-    quantity: '',
-    finishedProductWt: ''
-  }
+    dispatch(updateProductRateCall(payload));
+  };
 
   return (
     <>
-
+      {loadRates && <ScreenLoader />}
       <View style={styles.pickerContainer}>
+        <View style={styles.rateContainer}>
+          <View
+            style={{
+              flex: 0.4,
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+            }}
+          >
+            <StyledHeadingText style={styles.toggleLabel}>
+              User Rates
+            </StyledHeadingText>
+          </View>
 
-            <View style={styles.rateContainer}>
-                <View style={{flex:.4,justifyContent:'center',alignItems : 'flex-end',}}>
-                <StyledHeadingText style={styles.toggleLabel}>User Rates</StyledHeadingText>
-                </View>
+          <View
+            style={{
+              flex: 0.2,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Switch
+              trackColor={{ false: '#767577', true: Colors.red }}
+              thumbColor={globalToggle ? Colors.brand : '#f4f3f4'}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={handleglobalToggle}
+              value={globalToggle}
+            />
+          </View>
 
-                <View style={{flex:.2,justifyContent:'center',alignItems : 'center'}}>
-                <Switch
-                        trackColor={{ false: "#767577", true: Colors.red }}
-                        thumbColor={globalToggle ? Colors.brand : "#f4f3f4"}
-                        ios_backgroundColor="#3e3e3e"
-                        onValueChange={handleglobalToggle}
-                        value={globalToggle}
-                    />
-                </View>
+          <View
+            style={{
+              flex: 0.4,
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+            }}
+          >
+            <StyledHeadingText style={styles.toggleLabel}>
+              Global Rates
+            </StyledHeadingText>
+          </View>
+        </View>
 
-                <View style={{flex:.4,justifyContent:'center',alignItems:'flex-start'}}>
-                <StyledHeadingText style={styles.toggleLabel}>Global Rates</StyledHeadingText>
-                </View>
-            </View>
-
-
-
-
-        <StyledInputLabel style={{ color: Colors.brand,marginBottom : 5 }}>Select Process</StyledInputLabel>
+        <StyledInputLabel style={{ color: Colors.brand, marginBottom: 5 }}>
+          Select Process
+        </StyledInputLabel>
         <Dropdown
           selectedValue={selectedProcess}
           handlePickerChange={handleProcessSelection}
           itemList={processDropdownList}
           styles={styles.picker}
           itemStyles={styles.pickerItem}
-    
         />
       </View>
-     {!globalToggle && <View style={styles.pickerContainer}>
-        <StyledInputLabel style={{ color: Colors.brand }}>Select user</StyledInputLabel>
-        <Dropdown
-          selectedValue={selectedNextUser}
-          handlePickerChange={(value, index) => handleUserSelection(value, index)}
-          itemList={filteredUsers}
-          styles={styles.picker}
-          itemStyles={styles.pickerItem}
-       
-        />
-      </View>}
+      {!globalToggle && (
+        <View style={{ width: '80%', zIndex: 999, left: '10%' }}>
+          <DropdownSearchable
+            getItemSelection={(user) => handleUserSelection(user)}
+            items={filteredUsers}
+            selectedItem={selectedNextUser}
+          />
+        </View>
+      )}
 
       <Formik
-        initialValues={initialValues}
+        enableReinitialize={true}
+        initialValues={formState}
         onSubmit={(values, { resetForm }) => {
-
-          handleFormSubmission(values)
-          setTimeout(() => { resetForm(initialValues) }, 500)
-
-
-        }}>
-
-        {({ handleChange, handleBlur, handleSubmit, resetForm, values, }) => (
+          handleFormSubmission(values);
+          setTimeout(() => {
+            resetForm(initialValues);
+            setNextUser({})
+          }, 500);
+        }}
+      >
+        {({ handleChange, handleBlur, handleSubmit, resetForm, values }) => (
           <>
-
-            <View >
+            <View>
               <View style={styles.labelContainer}>
                 <StyledHeadingText>Enter rates (in /kgs)</StyledHeadingText>
-
               </View>
               <RequestFormWrapper>
-
                 <Card>
-
-                  {processStepsMap[selectedProcess !== processList.WAREHOUSE ? selectedProcess : selectedProcess]?.map(({ value, label }, index) => {
+                  {processStepsMap[selectedProcess]?.map(({ value, label }, index) => {
                     return (
                       <View style={styles.inputContainer}>
                         <NumericInput
@@ -202,64 +258,56 @@ const ProductRatesForm = ({loading }) => {
                           placeholderFontSize={18}
                         />
                       </View>
-                    )
+                    );
                   })}
-
-
                 </Card>
-
-
               </RequestFormWrapper>
 
-              {loading ?
+              {updateRate ? (
                 <ActivityIndicator size={'large'} />
-                :
-
+              ) : (
                 <RoundButton
                   iconColor={Colors.primary}
                   styles={styles.submitButton}
                   buttonClickedHandler={handleSubmit}
                   iconSize={40}
                   onPress={handleSubmit}
-                 
-                  icon={<Ionicons name="arrow-forward" size={24} color={Colors.primary} />}
-                />}
-             </View>
-
-
+                  icon={
+                    <Ionicons
+                      name="arrow-forward"
+                      size={24}
+                      color={Colors.primary}
+                    />
+                  }
+                />
+              )}
+            </View>
           </>
-
         )}
-
-
       </Formik>
     </>
-  )
-}
+  );
+};
 
-export default ProductRatesForm
-
+export default ProductRatesForm;
 
 const styles = StyleSheet.create({
-
-  dropdownLayout: {
-  },
+  dropdownLayout: {},
   submitButton: {
     backgroundColor: Colors.textBlue,
     width: 70,
     height: 70,
     alignSelf: 'center',
-    marginTop: 10
+    marginTop: 10,
   },
   inputContainer: {
     marginBottom: 15,
     borderBottomColor: Colors.secondary,
     borderBottomWidth: 1,
-
   },
   labelContainer: {
     padding: 5,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   picker: {
     padding: 10,
@@ -269,8 +317,6 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
     borderStyle: 'solid',
     backgroundColor: Colors.secondary,
-
-
   },
   pickerItem: {
     backgroundColor: Colors.secondary,
@@ -279,24 +325,23 @@ const styles = StyleSheet.create({
   pickerContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20
+    marginBottom: 20,
   },
-  rateContainer : {
-    flexDirection : 'row',
-    justifyContent : 'center',
-    width : '100%',
-    paddingRight : 5,
-    paddingLeft : 5,
-    paddingBottom : 5,
-    paddingTop : 5,
-    marginTop : 15,
-    marginBottom : 25
+  rateContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '100%',
+    paddingRight: 5,
+    paddingLeft: 5,
+    paddingBottom: 5,
+    paddingTop: 5,
+    marginTop: 15,
+    marginBottom: 25,
   },
 
-  toggleLabel : {
-    textTransform : 'capitalize',
+  toggleLabel: {
+    textTransform: 'capitalize',
     fontSize: 16,
-    fontWeight : 'bold',
-  }
-
-})
+    fontWeight: 'bold',
+  },
+});
