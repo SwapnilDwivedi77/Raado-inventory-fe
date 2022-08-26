@@ -6,6 +6,9 @@ import SafeAreaView from '../components/atoms/SafeAreaView'
 import { useDispatch, useSelector } from 'react-redux';
 import Empty from '../components/atoms/Empty'
 import PullToRefresh from '../components/atoms/PullToRefresh';
+import FilterComponent from '../components/FilterComponent'
+import { filterConfig } from '../constants/filterConfig'
+import ScreenLoader from '../components/atoms/ScreenLoader'
 
 const ListingsScreen = (props) => {
 
@@ -16,13 +19,21 @@ const ListingsScreen = (props) => {
     const [refreshing, setRefreshing] = useState(false);
 
     const fetchTransactionLogs = () => {
-        dispatch(getActivityLogsCall(selectedProcess,userData.userId,setRefreshing))
+        dispatch(getActivityLogsCall({selectedProcess}))
     }
+
+
     useEffect(() => {
         fetchTransactionLogs()
-       
-
     }, [selectedProcess])
+
+    const filterTransactionLogs = (filter) => {
+        let filterParams = {}
+
+        if(filter[filterConfig.MY_DATA]) filterParams['userId'] = userData.userId
+        if(filter[filterConfig.STATUS_FILTER]?.length > 0) filterParams['status'] = filter[filterConfig.STATUS_FILTER]      
+        dispatch(getActivityLogsCall({selectedProcess,filterOptions : filterParams}))
+    }
 
     if(activityLogs.list.length === 0 ) 
     return (
@@ -32,28 +43,40 @@ const ListingsScreen = (props) => {
     )
 
     return (
-    
+      <>
+        {(activityLogs.loading || refreshing) && <ScreenLoader />}
+        <FilterComponent callOnFilter={filterTransactionLogs} />
         <SafeAreaView>
-            {activityLogs.loading || refreshing ?
-              <ActivityIndicator size={'large'}/> :
-
-                <FlatList
-                    data={activityLogs.list}
-                    renderItem={({ item }) => (
-                        <View style={{ flex: 1, marginBottom: 20, flexDirection: 'column', margin: 1, flexDirection: 'column' }}>
-                            <ListingItem listings={item}
-                            />
-                        </View>
-                    )}
-                    //Setting the number of column
-                    numColumns={1}
-                    keyExtractor={(item, index) => index}
-                    refreshControl={
-                        <RefreshControl refreshing={refreshing} onRefresh={fetchTransactionLogs} />
-                      }
-                />}
+          
+            <FlatList
+              data={activityLogs.list}
+              renderItem={({ item }) => (
+                <View
+                  style={{
+                    flex: 1,
+                    marginBottom: 20,
+                    flexDirection: 'column',
+                    margin: 1,
+                    flexDirection: 'column',
+                  }}
+                >
+                  <ListingItem listings={item} />
+                </View>
+              )}
+              //Setting the number of column
+              numColumns={1}
+              keyExtractor={(item, index) => index}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={fetchTransactionLogs}
+                />
+              }
+            />
+          
         </SafeAreaView>
-    )
+      </>
+    );
 }
 
 

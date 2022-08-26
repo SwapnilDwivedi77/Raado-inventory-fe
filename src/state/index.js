@@ -10,6 +10,7 @@ import allUsers from './reducers/allUser'
 import updateUserPermission from './reducers/updatePermission'
 import approveTrxn from './reducers/approveTrxn'
 import staticResources from './reducers/staticResources'
+import productRates from './reducers/productRate';
 
 export default combineReducers({ 
     user:userLogin,
@@ -22,5 +23,6 @@ export default combineReducers({
     allUsers : allUsers,
     updatePermission  : updateUserPermission,
     approveTrxn:approveTrxn,
-    staticResources:staticResources
+    staticResources:staticResources,
+    productRates  :productRates
 });

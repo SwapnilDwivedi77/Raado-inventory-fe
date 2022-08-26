@@ -38,7 +38,7 @@ const Login = (props) => {
                 <SubTitle>Account Login</SubTitle>
                 <LoginForm
                     handleSubmitLogin={handleSubmitLogin}
-                    loading={loginState.loading}
+                    loading={false}
                     loginSuccess={loginState.success}
                 />
                 <ExtraView>

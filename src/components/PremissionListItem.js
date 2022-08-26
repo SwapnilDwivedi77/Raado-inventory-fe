@@ -63,7 +63,7 @@ const PremissionListItem = ({ permission, userPermissionData,handlePermissionUpd
 
                 <View style={styles.text}>
 
-                    <StyledText>{permission.label}</StyledText>
+                    <StyledText style={{ textAlign:"center"}}>{permission.label}</StyledText>
 
                 </View>
 
@@ -93,8 +93,7 @@ export default PremissionListItem
 const styles = StyleSheet.create({
 
     container: {
-        paddingTop: 5,
-        paddingBottom: 5,
+       
         paddingLeft: 10,
         borderBottomColor: Colors.secondary,
         borderBottomWidth: 2,
@@ -112,7 +111,9 @@ const styles = StyleSheet.create({
         flex: .6,
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 15
+        marginTop: 15,
+        textAlign: 'center',
+        marginBottom: 14
     },
 
     switch: {

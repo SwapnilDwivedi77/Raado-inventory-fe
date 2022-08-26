@@ -1,4 +1,4 @@
-import { TouchableOpacity, StyleSheet } from 'react-native'
+import { TouchableOpacity, StyleSheet,View,Text } from 'react-native'
 import React, { useState, useEffect } from 'react'
 
 import { MaterialCommunityIcons, MaterialIcons,Ionicons,FontAwesome } from '@expo/vector-icons';
@@ -16,13 +16,15 @@ import { HeaderWrapper, HeaderAction, DropdownWrapper } from './style'
 import { logoutUser } from '../actions/users';
 import { selectedProcessAction } from '../actions/selectedProcessAction'
 import {isEmpty} from '../utils/index'
+import { fetchUserPremissions } from '../actions/getUserPermissions';
 
 const ScreenHeader = (props) => {
 
   const dispatch = useDispatch();
-  const userData = useSelector(state => state.user).userData;
+  const {userData,userPermissions} = useSelector(state => state.user);
   const [permissionDropdown, setpermissionDropdown] = useState([])
 
+  const [selectedValue, setSelectedValue] = useState(processDropdownList[0].value)
   const handleLogout = (values) => {
     hideMenu()
     dispatch(logoutUser(values));
@@ -31,18 +33,16 @@ const ScreenHeader = (props) => {
 
   useEffect(() => {
     let temp = []
-
-    if(!isEmpty(userData) && !isEmpty(userData.permissions)){
-     userData.permissions.forEach(({ processName }) => {
+    userPermissions.forEach(({ processName }) => {
       temp.push({ label: processLabels[processName], value: processName })
     });
     setpermissionDropdown(temp);
+    setSelectedValue(temp[0].value)
     dispatch(selectedProcessAction(temp[0].value))
-  }
+  
 
-  }, [userData])
+  }, [userPermissions])
 
-  const [selectedValue, setSelectedValue] = useState(processDropdownList[0].value)
   const [menuVisible, setMenuVisible] = useState(false);
 
   const isAdmin = useSelector(state => state.user).userData.admin
@@ -61,7 +61,7 @@ const ScreenHeader = (props) => {
   }
 
   const handlePermissionRefresh = () => {
-    dispatch(userLoginCall(userData))
+    dispatch(fetchUserPremissions(userData.userId))
   }
   return (
     <>
@@ -72,8 +72,8 @@ const ScreenHeader = (props) => {
             itemList={permissionDropdown}
             styles={styles.picker}
             itemStyles={styles.pickerItem} />
-             <TouchableOpacity onPress={() => {handlePermissionRefresh}} style={{marginRight:4}}>
-            <Ionicons name="reload-circle" size={24} color={Colors.primary} />
+             <TouchableOpacity onPress={handlePermissionRefresh} style={{marginRight:4}}>
+            <Ionicons name="reload-circle" size={24} color={Colors.dark} />
           </TouchableOpacity>
         </DropdownWrapper>
         <HeaderAction>
@@ -81,33 +81,63 @@ const ScreenHeader = (props) => {
             visible={menuVisible}
             style={styles.menu}
             anchor={<TouchableOpacity onPress={showMenu}>
-              <MaterialCommunityIcons name="dots-vertical" size={24} color={Colors.primary} />
+              <MaterialCommunityIcons name="dots-vertical" size={24} color={Colors.dark} />
             </TouchableOpacity>}
             onRequestClose={hideMenu}
           >
             {isAdmin &&
               <>
                 <MenuItem onPress={() => handleMenuNavigation(routes.PERMISSIONS)}>
+                  <View style={styles.menuItemWrapper}>
                   <MaterialIcons name="admin-panel-settings" size={24} color={Colors.brand} />
+                  
+                  <Text>
                   Permissions
+                    </Text>
+                  </View>
+                 
                   </MenuItem>
                 <MenuDivider color={Colors.brand} />
 
+                
                 <MenuItem onPress={() => handleMenuNavigation(routes.RATES)}>
+                <View style={styles.menuItemWrapper}>
                 <FontAwesome name="rupee" size={24} color={Colors.brand} />
-                  Rates
+                 <Text>
+                 Rates
+                   </Text> 
+                </View>
+               
                 </MenuItem>
                 <MenuDivider color={Colors.brand} />
               </>
             }
+            <MenuItem onPress={() => handleMenuNavigation(routes.ANALYTICS)}>
+            <View style={styles.menuItemWrapper}>
+              <MaterialIcons name="analytics" size={24} color={Colors.brand} />
+            <Text>
+              Reports</Text>
+              </View>
+              </MenuItem>
+              <MenuDivider color={Colors.brand} />
             <MenuItem onPress={() => handleMenuNavigation(routes.PROFILE)}>
+            <View style={styles.menuItemWrapper}>
               <MaterialIcons name="account-circle" size={24} color={Colors.brand} />
-              Profile</MenuItem>
+            <Text>
+              Profile</Text>
+              </View>
+              </MenuItem>
+              
             <MenuDivider color={Colors.brand} />
-            <MenuItem onPress={handleLogout}>
-              <MaterialCommunityIcons name="logout" size={24} color={Colors.brand} />
 
-              Logout
+            
+            <MenuItem onPress={handleLogout}>
+            <View style={styles.menuItemWrapper}>
+              <MaterialCommunityIcons name="logout" size={24} color={Colors.brand} />
+             <Text>
+               Logout
+               </Text>
+              </View>
             </MenuItem>
             <MenuDivider color={Colors.brand} />
           </Menu>
@@ -123,16 +153,16 @@ export default ScreenHeader
 const styles = StyleSheet.create({
   picker: {
     padding: 0,
-    color: Colors.primary,
+    color: Colors.dark,
     width: 220,
-    borderWidth: 2,
-    borderColor: Colors.primary,
+    borderWidth: 1,
+    borderColor: Colors.brand,
     borderStyle: 'solid'
 
   },
   header: {
     borderBottomWidth: 0,
-    backgroundColor: Colors.brand,
+    backgroundColor: Colors.light,
     shadowColor: '#000',
     shadowOpacity: 0.25,
     shadowRadius: 20,
@@ -145,10 +175,16 @@ const styles = StyleSheet.create({
     fontWeight: 400,
     width: 150,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   pickerItem: {
-    backgroundColor: Colors.brand,
+    // backgroundColor: Colors.brand,
     color: Colors.primary,
-  }
+  },
+  menuItemWrapper : {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });

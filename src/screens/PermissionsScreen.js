@@ -12,7 +12,7 @@ import DropdownSearchable from '../components/atoms/DropdownSearchable'
 import { getAllUserCall } from '../actions/getAllUserAction'
 import { updateUserPermissionCall } from '../actions/updatePermissionAction'
 import SafeAreaView from '../components/atoms/SafeAreaView'
-import { isEmpty } from '../utils'
+import { getSearchableDropdownItems, isEmpty } from '../utils'
 import PermissionList from '../components/PermissionList'
 
 
@@ -37,15 +37,11 @@ const PermissionsScreen = (props) => {
   }, [])
 
   useEffect(()=>{
-
-    let temp=[]
-
-    !isEmpty(usersList.list) && usersList.list.forEach((user) =>{
-      if(user.userId !== userData.userId) {
-        temp.push({id : user.userId,name : user.name + ',' + user.phoneNo})
-      }
-    })
-    setUserDropdownList(temp)
+    
+   if(!isEmpty(usersList.list)) {
+     let list = getSearchableDropdownItems(usersList.list,userData.userId);
+     setUserDropdownList(list)
+   }
 
 
   },[usersList])
@@ -54,7 +50,6 @@ const PermissionsScreen = (props) => {
 
     setSelectedUser(user)
     let temp = usersList.list.filter(obj => obj.userId === user.id)
-    console.log(temp[0].permissions)
     setpermissionList(temp[0].permissions)
 
   }
@@ -97,20 +92,18 @@ let updatedPermission = permissionList
 
 
   return (
-
+    
     <SafeAreaView>
-      
       <View style={{width: '80%', position: 'absolute',
           zIndex: 9999,marginLeft : 30,}}>
           <DropdownSearchable
             getItemSelection={(user) => handleItemSelection(user)}
             items={userDropdownList}
             selectedItem={selectedUser}
-            handleUserFetch={handleUserFetch}
           />
         </View>
         <View>
-          <TouchableOpacity onPress={() => {handleUserFetch();resetPage();}} style={{ marginLeft: 'auto',marginTop:20 }}>
+          <TouchableOpacity onPress={() => {handleUserFetch();resetPage();}} style={{ marginLeft: 'auto',marginTop:10 }}>
             <Ionicons name="reload-circle" size={34} color={Colors.brand} />
           </TouchableOpacity>
         </View>
@@ -121,13 +114,13 @@ let updatedPermission = permissionList
         {usersList.loading && <ActivityIndicator size={'small'} />}
 
           <View style={styles.heading}>
-            <View style={{ flex: .3 }}>
+            <View style={{ flex: .2 }}>
               <StyledHeadingText style={{ ...styles.textStyles, marginRight: 13 }}>Select</StyledHeadingText>
             </View>
             <View style={{ flex: .4, justifyContent: 'center', alignItems: 'center' }}>
               <StyledHeadingText style={{ ...styles.textStyles, marginRight: 13 }}>Process</StyledHeadingText>
             </View>
-            <View style={{ flex: .3 }}>
+            <View style={{ flex: .4,alignItems: 'center'}}>
               <StyledHeadingText style={{ ...styles.textStyles, marginRight: 13 }}>Write Access</StyledHeadingText>
             </View>
           </View>
@@ -138,9 +131,7 @@ let updatedPermission = permissionList
            handleWritePermission={handleWritePermission}
            selectedUser={selectedUser}
           />
-        </View>
-
-        {updateState.loading ?
+          {updateState.loading ?
           <ActivityIndicator size={'large'} /> :
 
           <RoundButton
@@ -150,8 +141,11 @@ let updatedPermission = permissionList
             onPress={handleSubmit}
             icon={<Ionicons name="arrow-forward" size={34} color={Colors.primary} />}
           />}
-     
+        </View>
+
+        
     </SafeAreaView>
+    
   )
 }
 
@@ -159,14 +153,14 @@ export default PermissionsScreen
 
 const styles = StyleSheet.create({
   container: {
-
-marginTop : 25
+    flex: 1,
+    marginTop : 25,
 
   },
 
   heading: {
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingTop: 15,
+    paddingBottom: 15,
     paddingLeft: 10,
     borderBottomColor: Colors.tertiary,
     borderBottomWidth: 2,
@@ -186,7 +180,8 @@ marginTop : 25
     backgroundColor: Colors.textBlue,
     width: 100,
     height: 100,
-    alignSelf: 'center',
-    marginTop: 10
+   position : 'absolute',
+   bottom: 25,
+   right : '40%',
   },
 })

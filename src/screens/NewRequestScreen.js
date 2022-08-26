@@ -1,47 +1,41 @@
-import React ,{useState,useEffect} from 'react'
-import {View} from 'react-native'
-import DropdownSearchable from '../components/atoms/DropdownSearchable'
+import React ,{useEffect, useState} from 'react'
 import NewRequestForm from '../components/NewRequestForm'
-import { ScreenWrapper } from '../components/style'
-
 import { getAllUserCall } from '../actions/getAllUserAction'
-
 import { useDispatch, useSelector } from 'react-redux'
-import { getNewRequestEntries } from '../utils'
-
 import {newRequestCall} from '../actions/newRequestAction'
 import SafeAreaView from '../components/atoms/SafeAreaView'
+import PullToRefresh from '../components/atoms/PullToRefresh'
 
 const NewRequestScreen = () => {
 
+  const [refresh , setRefreshing] = useState(false)
   const selectedProcess = useSelector(state => state.selectedProcess).value;
   const dispatch = useDispatch();
   const postNewRequest = useSelector(state => state.postNewRequest)
 
-  const [selectedUser,setSelectedUser] = useState({})
+  const getUsersList = () => {
+    dispatch(getAllUserCall(setRefreshing))    
+  }
 
   useEffect(() => {
-    dispatch(getAllUserCall())      
+    getUsersList();
 }, [])
 
 
   const handleNewRequestSubmit = (value) => {
    dispatch(newRequestCall(value,selectedProcess))
   }
-  
-  const handleDropdownChange = (value) => {
-    setSelectedUser(value)
-  }
-    
+
     return(
       
        <SafeAreaView>
+        <PullToRefresh refreshing = {refresh}  onRefresh={getUsersList}>
          <NewRequestForm
          handleNewRequestSubmit={handleNewRequestSubmit}
-         handleDropdownChange={handleDropdownChange}
          selectedProcess={selectedProcess}
          loading = {postNewRequest.loading}
          />
+        </PullToRefresh>
         </SafeAreaView>
     )
 }

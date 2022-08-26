@@ -35,3 +35,14 @@ export const  isEmpty= ( val ) => {
 
     return false;
 }
+
+export const getSearchableDropdownItems = (usersList,userId) => {
+    let temp=[]
+   !isEmpty(usersList) && usersList.forEach((user) =>{
+      if(user.userId !== userId) {
+        temp.push({id : user.userId,name : user.name + ',' + user.phoneNo})
+      }
+    })
+
+    return temp;
+}
