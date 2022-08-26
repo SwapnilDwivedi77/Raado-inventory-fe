@@ -15,7 +15,6 @@ import {saveLoginDetails} from './users'
 
 
  export const userLoginCall = (userData,fn) => {
-  console.log(userData)
     let URL = BASE_URL + USER_LOGIN + `?phoneNo=${userData.mobileNumber ? userData.mobileNumber : userData.phoneNo}&password=${userData.password}`
 
     return dispatch => {

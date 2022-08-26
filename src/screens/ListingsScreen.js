@@ -28,12 +28,10 @@ const ListingsScreen = (props) => {
     }, [selectedProcess])
 
     const filterTransactionLogs = (filter) => {
-        console.log('params from filter',{filter},filter[filterConfig.MY_DATA])
         let filterParams = {}
 
         if(filter[filterConfig.MY_DATA]) filterParams['userId'] = userData.userId
         if(filter[filterConfig.STATUS_FILTER]?.length > 0) filterParams['status'] = filter[filterConfig.STATUS_FILTER]      
-        console.log('before call',{filterParams})
         dispatch(getActivityLogsCall({selectedProcess,filterOptions : filterParams}))
     }
 

@@ -63,11 +63,9 @@ const AnalyticsForm = (props) => {
   }, []);
 
   const onEndChange = (event, selectedDate) => {
-    console.log('end date', selectedDate);
     setEndDate(selectedDate);
   };
   const onStartChange = (event, selectedDate) => {
-    console.log('Start Date', new Date(selectedDate));
     setStartDate(selectedDate);
   };
 
@@ -160,7 +158,6 @@ const AnalyticsForm = (props) => {
 };
 
   const downloadReport = () => {
-    console.log('download');
     setDownloadProgress(true)
     let url = BASE_URL_ANALYTICS
 
@@ -190,7 +187,6 @@ const AnalyticsForm = (props) => {
        data.userId = selectedUser.id
 }
 
-    console.log({data,url})
     axios
       .post(
         url,data,{'headers' : headers}

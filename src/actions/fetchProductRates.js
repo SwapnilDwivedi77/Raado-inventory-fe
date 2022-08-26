@@ -20,7 +20,6 @@ import { notifyMessage } from '../utils/showToast';
     } else {
       URL += GET_USER_RATES + `?userId=${params.id}`;
     }
-    console.log(URL) 
     return dispatch => {
       dispatch(fetchProductRatesInit());
 

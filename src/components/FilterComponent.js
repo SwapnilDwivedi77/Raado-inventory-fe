@@ -7,8 +7,6 @@ import { Menu, MenuItem, MenuDivider } from 'react-native-material-menu';
 import { Entypo } from '@expo/vector-icons';
 
 const FilterComponent = ({ callOnFilter }) => {
-  // console.log({filterConfig})
-
   const [menuVisible, setMenuVisible] = useState(false);
   const [toggle, setToggle] = useState(false);
   const [selectedStatus,setStatus] = useState('');

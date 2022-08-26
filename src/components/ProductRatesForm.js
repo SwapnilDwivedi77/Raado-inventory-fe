@@ -84,7 +84,6 @@ const ProductRatesForm = () => {
       });
       if (!isEmpty(nextUsers)) {
         let list = getSearchableDropdownItems(nextUsers, userData.userId);
-        console.log(list)
         setFilteredUser(list);
       }
     }
@@ -93,7 +92,6 @@ const ProductRatesForm = () => {
   const getFormStateFromData = (obj) => {
    let state = {} 
   !isEmpty(obj) && Object.keys(obj).forEach(key => state[key] = obj[key].toString())
-   console.log('this is processed state',state)
     return state;
   };
 
@@ -144,8 +142,6 @@ const ProductRatesForm = () => {
         ? selectedProcess
         : selectedProcess,
     );
-
-    console.log('This is formData',formData);
 
     let payload = {
       selectedProcess: selectedProcess,

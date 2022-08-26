@@ -15,10 +15,8 @@ export const fetchLogsSucess = (payload) => ({ type : FETCH_LOGS_SUCCESS,payload
 
 
     let URL = BASE_URL + GET_TRANSACTIONS_LIST + `?commonProcess=${selectedProcess}`
-    console.log('In api call',{filterOptions})
     if(filterOptions?.userId) URL += `&commonUserId=${filterOptions.userId}`
     if(filterOptions?.status) URL += `&status=${filterOptions.status}`
-    console.log(URL)
     return dispatch => {
       dispatch(fetchLogsInit());
   
@@ -29,7 +27,6 @@ export const fetchLogsSucess = (payload) => ({ type : FETCH_LOGS_SUCCESS,payload
       })
       .catch(err => {
         dispatch(fetchLogsFailed());
-        console.log('from activity call',err)
         notifyMessage('Something went wrong!',err)
       });
 

@@ -14,9 +14,6 @@ const  updateProductRateSuccess = () => ({ type : UPDATE_PRODUCT_RATE_SUCCESS})
  export const updateProductRateCall = (payload) => {
 
     let URL = BASE_URL + UPADATE_USER_RATES.replace('{processName}',payload.selectedProcess) + `?userId=${payload.userId}`
-
-    console.log('This is url for rates update',URL)
-
     return dispatch => {
       dispatch(updateProductRateInit());
       axios
