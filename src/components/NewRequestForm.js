@@ -1,118 +1,157 @@
-import { StyleSheet, View, ActivityIndicator } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { Formik } from 'formik'
-import RoundButton from './atoms/RoundButton'
+import { StyleSheet, View, ActivityIndicator,Switch } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Formik } from 'formik';
+import RoundButton from './atoms/RoundButton';
 import { Ionicons } from '@expo/vector-icons';
 import {
   Colors,
   RequestFormWrapper,
-  StyledInputLabel, StyledHeadingText, TextLinkContent,
-} from './style'
+  StyledInputLabel,
+  StyledHeadingText,
+  TextLinkContent,
+} from './style';
 
+import NumericInput from './atoms/NumericInput';
+import {
+  processStepsMap,
+  processLabels,
+  processList,
+  processFlow,
+  processDropdownList
+} from '../constants/ProcessList';
+import Card from './atoms/Card';
+import Dropdown from './atoms/Dropdown';
+import { useSelector } from 'react-redux';
+import { getNewRequestEntries, isEmpty } from '../utils';
 
-import NumericInput from './atoms/NumericInput'
-import { processStepsMap, processLabels, processList, processFlow } from '../constants/ProcessList'
-import Card from './atoms/Card'
-import Dropdown from './atoms/Dropdown'
-import { useSelector } from 'react-redux'
-import { getNewRequestEntries, isEmpty,} from '../utils'
+const NewRequestForm = ({
+  handleNewRequestSubmit,
+  loading,
+  selectedProcess,
+}) => {
+  const { userData, userPermissions } = useSelector((state) => state.user);
+  let fromUserId = userData.userId;
+  const usersList = useSelector((state) => state.allUsers).list;
+  const [selectedNextProcess, setselectedNextProcess] = useState();
+  const [nextProcessOptions, setNextProcessOptions] = useState([]);
+  const [filteredUsers, setFilteredUser] = useState([]);
+  const [selectedNextUser, setNextUser] = useState('');
+  const [isWrite, setIsWrite] = useState(false);
+  const [productFields,setProductFields] = useState([]);
+  const [rawMaterialRemaining,setRawMaterialRemaining] = useState(false);
 
-
-
-const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) => {
-
-  const { userData,userPermissions } = useSelector(state => state.user)
-  let fromUserId = userData.userId
-  const usersList = useSelector(state => state.allUsers).list;
-  const [selectedNextProcess, setselectedNextProcess] = useState()
-  const [nextProcessOptions, setNextProcessOptions] = useState([])
-  const [filteredUsers, setFilteredUser] = useState([])
-  const [selectedNextUser, setNextUser] = useState('')
-  const [isWrite, setIsWrite] = useState(false)
+  const [fromWareHouse , setFromWareHouse] = useState(false);
+  const [toWareHouse,setToWareHouse] = useState(false);
 
   const checkPermissionExists = (permissions, process) => {
     let temp = [];
-    temp = permissions.filter((per) => per.processName === process && per.write);
+    temp = permissions.filter(
+      (per) => per.processName === process && per.write,
+    );
 
-    return temp.length
+    return temp.length;
   };
 
-  const findUserdWithNextPermissions = (nextProcess) => {
-    let nextUsers = []
-    if (usersList.length > 0) {
-      usersList.forEach((user) => {
-        if (user && checkPermissionExists(user.permissions , nextProcess) && user.userId !== fromUserId) {
-          let idx = processFlow.indexOf(idx + 1)
-          nextUsers.push({ label: user.name, value: user.userId })
-        }
-      })
-      setFilteredUser(nextUsers)
-      if (nextUsers.length > 0)
-        setNextUser(nextUsers[0].value)
-    }
-  }
-  const findNextProcessForUser = () => {
-
-    let nextProcess = []
-    if (selectedProcess === processList.WAREHOUSE) {
-      processFlow.forEach((pre) => {
-        nextProcess.push({ label: processLabels[pre], value: pre })
-
-      })
-
-      setNextProcessOptions(nextProcess)
-      setselectedNextProcess(nextProcess[0].value)
-      findUserdWithNextPermissions(nextProcess[0].value)
+  const getProductFields = (fromProcess,nextProcess,rawRemaining=rawMaterialRemaining) =>{
+    let fields = []
+    let processArray = Object.keys(processStepsMap)
+   
+    if(fromProcess === processList.WAREHOUSE) {
+      let nextIdx = processArray.indexOf(nextProcess);
+      fields = processStepsMap[processArray[nextIdx-1]]
     }
     else {
-      let idx = processFlow.indexOf(selectedProcess)
-      nextProcess = processFlow[idx + 1]
-      setNextProcessOptions([{ label: processLabels[nextProcess], value: nextProcess }, { label: processLabels.WAREHOUSE, value: processList.WAREHOUSE },])
-      setselectedNextProcess(nextProcess)
-      findUserdWithNextPermissions(nextProcess)
+      let nextIdx = processArray.indexOf(fromProcess);
+      fields = processStepsMap[processArray[nextIdx]]
+      if(rawRemaining) {
+        let rawFields = processStepsMap[processArray[nextIdx-1]]
+        fields = [...rawFields,...fields]
+      }
+    }
+    setProductFields(fields)
+
+  }
+
+  const findUserdWithNextPermissions = (nextProcess) => {
+    let nextUsers = [];
+    if (usersList.length > 0) {
+      usersList.forEach((user) => {
+        if (
+          user &&
+          checkPermissionExists(user.permissions, nextProcess) &&
+          user.userId !== fromUserId
+        ) {
+          nextUsers.push({ label: user.name, value: user.userId });
+        }
+      });
+      setFilteredUser(nextUsers);
+      if (nextUsers.length > 0) setNextUser(nextUsers[0].value);
+    }
+  };
+  const findNextProcessForUser = () => {
+    let nextProcess = [];
+    if (selectedProcess !== processList.WAREHOUSE) {
+     nextProcess = [{label: processLabels[processList.WAREHOUSE], value :processList.WAREHOUSE}]
+     setToWareHouse(true)
+     setselectedNextProcess(nextProcess[0].value);
+      findUserdWithNextPermissions(nextProcess[0].value);
+    } else {
+      nextProcess = processDropdownList.filter(obj => obj.value !== processList.WAREHOUSE && obj.value !== processList[Object.keys(processStepsMap)[0]])
+      setToWareHouse(false)
+      setselectedNextProcess(nextProcess[0].value);
+      findUserdWithNextPermissions(nextProcess[0].value);
     }
 
-  }
+    getProductFields(selectedProcess,nextProcess[0].value)
+    setNextProcessOptions(nextProcess);
+  };
 
   useEffect(() => {
-
-    findNextProcessForUser()
-    console.log('selected process',selectedProcess)
+    setFromWareHouse(selectedProcess === processList.WAREHOUSE)
+    findNextProcessForUser();
     let write = true;
-    write = userPermissions.filter((per) => per.processName === selectedProcess)[0].write
-    setIsWrite(write)
-
-  }, [selectedProcess])
+    write = userPermissions.filter(
+      (per) => per.processName === selectedProcess,
+    )[0].write;
+    setIsWrite(write);
+  }, [selectedProcess]);
 
   useEffect(() => {
-    console.log({selectedNextProcess})
-    if(!isEmpty(selectedNextProcess) && !isEmpty(usersList))
-     {
-      findUserdWithNextPermissions(selectedNextProcess)
-     }
-  },[usersList])
-
+    if (!isEmpty(selectedNextProcess) && !isEmpty(usersList)) {
+      findUserdWithNextPermissions(selectedNextProcess);
+    }
+  }, [usersList]);
 
   const handleNextProcessSelection = (sel) => {
-    setselectedNextProcess(sel)
-    findUserdWithNextPermissions(sel)
-  }
+    setselectedNextProcess(sel);
+    findUserdWithNextPermissions(sel);
+    getProductFields(selectedProcess,sel)
+  };
 
   const handleUserSelection = (value, index) => {
-    setNextUser(value)
-  }
+    setNextUser(value);
+  };
 
   const handleFormSubmission = (values) => {
-
     let formData = {
       fromProcess: selectedProcess,
       toProcess: selectedNextProcess,
       status: 'CREATED',
-      entries: getNewRequestEntries(values, selectedProcess === processList.WAREHOUSE ? selectedNextProcess : selectedProcess),
+      entries: getNewRequestEntries(
+        values,
+        selectedProcess === processList.WAREHOUSE
+          ? selectedNextProcess
+          : selectedProcess,
+      ),
       fromUserId: fromUserId,
-      toUserId: selectedNextUser
-    }
-    handleNewRequestSubmit(formData)
+      toUserId: selectedNextUser,
+    };
+    handleNewRequestSubmit(formData);
+  };
+
+  const handleRawToggle = () => {
+    setRawMaterialRemaining(!rawMaterialRemaining)
+    getProductFields(selectedProcess,selectedNextProcess,!rawMaterialRemaining)
   }
 
   const initialValues = {
@@ -127,14 +166,15 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) =>
     polishedSticksWt: '',
     size: '',
     quantity: '',
-    finishedProductWt: ''
-  }
+    finishedProductWt: '',
+  };
 
   return (
     <>
-      
       <View style={styles.pickerContainer}>
-        <StyledInputLabel style={{ color: Colors.brand }}>Select next Process</StyledInputLabel>
+        <StyledInputLabel style={{ color: Colors.brand }}>
+          Select next Process
+        </StyledInputLabel>
         <Dropdown
           selectedValue={selectedNextProcess}
           handlePickerChange={handleNextProcessSelection}
@@ -145,10 +185,14 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) =>
         />
       </View>
       <View style={styles.pickerContainer}>
-        <StyledInputLabel style={{ color: Colors.brand }}>Select receiving user</StyledInputLabel>
+        <StyledInputLabel style={{ color: Colors.brand }}>
+          Select receiving user
+        </StyledInputLabel>
         <Dropdown
           selectedValue={selectedNextUser}
-          handlePickerChange={(value, index) => handleUserSelection(value, index)}
+          handlePickerChange={(value, index) =>
+            handleUserSelection(value, index)
+          }
           itemList={filteredUsers}
           styles={styles.picker}
           itemStyles={styles.pickerItem}
@@ -159,26 +203,23 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) =>
       <Formik
         initialValues={initialValues}
         onSubmit={(values, { resetForm }) => {
-
-          handleFormSubmission(values)
-          setTimeout(() => { resetForm(initialValues) }, 500)
-
-
-        }}>
-
-        {({ handleChange, handleBlur, handleSubmit, resetForm, values, }) => (
+          handleFormSubmission(values);
+          setTimeout(() => {
+            resetForm(initialValues);
+          }, 500);
+        }}
+      >
+        {({ handleChange, handleBlur, handleSubmit, resetForm, values }) => (
           <>
-
-            <View >
+            <View>
               <View style={styles.labelContainer}>
-                <StyledHeadingText>Product details for this step.</StyledHeadingText>
-
+                <StyledHeadingText>
+                  Product details for this step.
+                </StyledHeadingText>
               </View>
               <RequestFormWrapper>
-
                 <Card>
-
-                  {processStepsMap[selectedProcess !== processList.WAREHOUSE ? selectedProcess : selectedNextProcess]?.map(({ value, label }, index) => {
+                  {productFields?.map(({ value, label }, index) => {
                     return (
                       <View style={styles.inputContainer}>
                         <NumericInput
@@ -195,19 +236,25 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) =>
                           editable={isWrite}
                         />
                       </View>
-                    )
+                    );
                   })}
 
+       {toWareHouse && <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <StyledHeadingText>Raw Material Remianing</StyledHeadingText>
+        <Switch
+          trackColor={{ false: '#767577', true: Colors.red }}
+          thumbColor={rawMaterialRemaining ? Colors.brand : '#f4f3f4'}
+          ios_backgroundColor="#3e3e3e"
+          onValueChange={handleRawToggle}
+          value={rawMaterialRemaining}/>
+        </View>}
 
                 </Card>
-
-
               </RequestFormWrapper>
 
-              {loading ?
+              {loading ? (
                 <ActivityIndicator size={'large'} />
-                :
-
+              ) : (
                 <RoundButton
                   iconColor={Colors.primary}
                   styles={styles.submitButton}
@@ -215,45 +262,49 @@ const NewRequestForm = ({ handleNewRequestSubmit, loading, selectedProcess }) =>
                   iconSize={40}
                   onPress={handleSubmit}
                   disabled={!isWrite}
-                  icon={<Ionicons name="arrow-forward" size={24} color={Colors.primary} />}
-                />}
-              {!isWrite && <View style={{ marginLeft: 'auto', marginRight: 'auto' }}><TextLinkContent>Dont have write access for this process.</TextLinkContent></View>}
+                  icon={
+                    <Ionicons
+                      name="arrow-forward"
+                      size={24}
+                      color={Colors.primary}
+                    />
+                  }
+                />
+              )}
+              {!isWrite && (
+                <View style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                  <TextLinkContent>
+                    Dont have write access for this process.
+                  </TextLinkContent>
+                </View>
+              )}
             </View>
-
-
           </>
-
         )}
-
-
       </Formik>
     </>
-  )
-}
+  );
+};
 
-export default NewRequestForm
-
+export default NewRequestForm;
 
 const styles = StyleSheet.create({
-
-  dropdownLayout: {
-  },
+  dropdownLayout: {},
   submitButton: {
     backgroundColor: Colors.textBlue,
     width: 70,
     height: 70,
     alignSelf: 'center',
-    marginTop: 10
+    marginTop: 10,
   },
   inputContainer: {
     marginBottom: 15,
     borderBottomColor: Colors.secondary,
     borderBottomWidth: 1,
-
   },
   labelContainer: {
     padding: 5,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   picker: {
     padding: 10,
@@ -263,8 +314,6 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
     borderStyle: 'solid',
     backgroundColor: Colors.secondary,
-
-
   },
   pickerItem: {
     backgroundColor: Colors.secondary,
@@ -273,7 +322,6 @@ const styles = StyleSheet.create({
   pickerContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20
-  }
-
-})
+    marginBottom: 20,
+  },
+});
