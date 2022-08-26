@@ -8,6 +8,7 @@ export const POST_NEW_REQUEST = '/transaction/addTransaction'
 export const UPDATE_USER_PERMISSION = '/user/updatePermissions'
 export const GET_USER_LIST = '/user/getUsers'
 export const UPDATE_TRANSACTION_STATUS = '/transaction/updateTransaction'
+export const GET_STATIC_RESOURCES = '/staticResource/getProcessWiseEntries'
 export const GET_USER_PERMISSION = '/user/getUserById'
 export const UPADATE_USER_RATES = '/user/{processName}/updateUserRate'
 

@@ -9,6 +9,7 @@ import postNewRequest from './reducers/postNewRequest'
 import allUsers from './reducers/allUser'
 import updateUserPermission from './reducers/updatePermission'
 import approveTrxn from './reducers/approveTrxn'
+import staticResources from './reducers/staticResources'
 import productRates from './reducers/productRate';
 
 export default combineReducers({ 
@@ -17,10 +18,11 @@ export default combineReducers({
     userSignUp : userSignUp,
     userLogin : userLoginCall,
     activityLogs : activityLogs,
-    approvalList:approvalList,
+    approvalList: approvalList,
     postNewRequest : postNewRequest,
     allUsers : allUsers,
     updatePermission  : updateUserPermission,
     approveTrxn:approveTrxn,
+    staticResources:staticResources,
     productRates  :productRates
 });
